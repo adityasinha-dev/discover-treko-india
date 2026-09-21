@@ -68,5 +68,5 @@ function Footer() {
 function FooterLinks({ title, links }: { title: string; links: string[] }) { return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-3">{links.map(link => <li key={link}><a href="#top" className="text-sm text-background/55 transition-colors hover:text-background">{link}</a></li>)}</ul></div>; }
 
 export function TrekoLanding() {
-  return <main className="overflow-hidden"><Hero /><Destinations /><HowItWorks /><Stays /><CabOperators /><WhyTreko /><Footer /><a href="#top" className="fixed bottom-5 right-5 z-30 grid size-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:-translate-y-1" aria-label="Back to top"><ArrowRight className="-rotate-90" /></a></main>;
+  return <main className="overflow-hidden"><Hero /><Destinations /><HowItWorks /><Stays /><CabOperators /><WhyTreko /><Footer /></main>;
 }
