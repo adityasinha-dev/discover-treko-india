@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, Search, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { z } from "zod";
+import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, Search, ShieldCheck, Sparkles, Star, UserRound } from "lucide-react";
 import heroImage from "@/assets/hero-ujjain.jpg";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { destinations, indianPlaces, operators, stays } from "@/data/treko";
 
 const nav = [
-  ["Explore Destinations", "#destinations"], ["Stays", "#stays"], ["Cab Operators", "#cabs"], ["How It Works", "#how-it-works"], ["About", "#about"],
+  ["Explore Destinations", "#destinations"], ["Stays", "#stays"], ["Cab Operators", "#cabs"], ["How It Works", "#how-it-works"], ["Become a Partner", "#partner"], ["About", "#about"],
 ];
 
 function Logo() {
@@ -55,6 +56,78 @@ function Info({ icon: Icon, label, value }: { icon: typeof MapPin; label: string
   return <div className="grid grid-cols-[auto_1fr] gap-3"><span className="grid size-8 place-items-center rounded-lg bg-secondary text-primary"><Icon className="size-4" /></span><div><p className="text-xs font-bold text-foreground">{label}</p><p className="mt-0.5 leading-5 text-muted-foreground">{value}</p></div></div>;
 }
 
+const partnerSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name").max(100),
+  business: z.string().trim().min(2, "Please enter your business name").max(120),
+  type: z.enum(["cab", "stay"], { message: "Choose a listing type" }),
+  destination: z.string().trim().min(2, "Please enter the destination you serve").max(100),
+  phone: z.string().trim().regex(/^[+\d][\d\s-]{7,14}$/, "Enter a valid phone number"),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  message: z.string().trim().max(500).optional().or(z.literal("")),
+});
+
+type PartnerForm = z.infer<typeof partnerSchema>;
+const emptyPartner: PartnerForm = { name: "", business: "", type: "cab", destination: "", phone: "", email: "", message: "" };
+
+function PartnerSection() {
+  const [form, setForm] = useState<PartnerForm>(emptyPartner);
+  const [errors, setErrors] = useState<Partial<Record<keyof PartnerForm, string>>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const update = (key: keyof PartnerForm, value: string) => { setForm(f => ({ ...f, [key]: value })); setErrors(e => ({ ...e, [key]: undefined })); };
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const result = partnerSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof PartnerForm, string>> = {};
+      for (const issue of result.error.issues) fieldErrors[issue.path[0] as keyof PartnerForm] = issue.message;
+      setErrors(fieldErrors);
+      return;
+    }
+    setSubmitted(true);
+  };
+  const inputClass = (key: keyof PartnerForm) => `h-12 w-full rounded-xl border ${errors[key] ? "border-destructive" : "border-border"} bg-background px-4 text-sm font-medium outline-none transition-colors focus:border-primary placeholder:font-normal placeholder:text-muted-foreground`;
+  return <section id="partner" className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><div className="grid items-start gap-10 overflow-hidden rounded-3xl border border-border bg-card shadow-card lg:grid-cols-[1fr_1.1fr]">
+    <div className="bg-foreground p-8 text-background md:p-12 lg:min-h-full">
+      <p className="section-label section-label-dark">Grow with Treko</p>
+      <h2 className="mt-3 font-display text-3xl font-semibold leading-tight md:text-5xl">Become a Partner</h2>
+      <p className="mt-4 max-w-md text-sm leading-7 text-background/70">Run a cab service or a stay in an Indian destination? Apply to list your business on Treko and help travellers plan their journey.</p>
+      <div className="mt-8 space-y-4">
+        <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-background/10 text-primary"><CarFront className="size-5" /></span><div><p className="font-semibold">Cab Operators</p><p className="mt-0.5 text-sm text-background/65">List your vehicles, routes and services for your destination.</p></div></div>
+        <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-background/10 text-primary"><BedDouble className="size-5" /></span><div><p className="font-semibold">Accommodation Providers</p><p className="mt-0.5 text-sm text-background/65">Showcase hotels, homestays and resorts to travellers.</p></div></div>
+        <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-background/10 text-primary"><ShieldCheck className="size-5" /></span><div><p className="font-semibold">Reviewed Before Listing</p><p className="mt-0.5 text-sm text-background/65">Every application is reviewed to keep listings trustworthy.</p></div></div>
+      </div>
+    </div>
+    <div className="p-8 md:p-12">
+      {submitted ? <div className="flex h-full min-h-80 flex-col items-center justify-center text-center">
+        <span className="grid size-16 place-items-center rounded-full bg-accent text-primary"><Check className="size-7" /></span>
+        <h3 className="mt-6 font-display text-2xl font-semibold">Application received!</h3>
+        <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">Thanks, {form.name.split(" ")[0]}. We've noted your {form.type === "cab" ? "cab operator" : "accommodation"} listing for {form.destination}. We'll reach out at {form.email} after review.</p>
+        <Button variant="outline" className="mt-6 rounded-full" onClick={() => { setSubmitted(false); setForm(emptyPartner); }}>Submit another application</Button>
+      </div> : <form onSubmit={submit} noValidate className="space-y-4">
+        <h3 className="font-display text-2xl font-semibold">Apply to List Your Business</h3>
+        <p className="-mt-2 text-sm text-muted-foreground">Fill in a few details and our team will review your listing.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div><label htmlFor="p-name" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Your name</label><input id="p-name" value={form.name} onChange={e => update("name", e.target.value)} placeholder="Full name" className={inputClass("name")} maxLength={100} />{errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}</div>
+          <div><label htmlFor="p-business" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Business name</label><input id="p-business" value={form.business} onChange={e => update("business", e.target.value)} placeholder="e.g. Ganga Travels" className={inputClass("business")} maxLength={120} />{errors.business && <p className="mt-1 text-xs text-destructive">{errors.business}</p>}</div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div><span className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Listing type</span><div className="grid grid-cols-2 gap-2">
+            {([["cab", CarFront, "Cab Operator"], ["stay", BedDouble, "Stay / Hotel"]] as const).map(([value, Icon, label]) => <button type="button" key={value} onClick={() => update("type", value)} className={`flex h-12 items-center justify-center gap-2 rounded-xl border text-sm font-semibold transition-colors ${form.type === value ? "border-primary bg-accent text-primary" : "border-border bg-background text-muted-foreground hover:border-primary/50"}`}><Icon className="size-4" />{label}</button>)}
+          </div></div>
+          <div><label htmlFor="p-destination" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Destination you serve</label><input id="p-destination" value={form.destination} onChange={e => update("destination", e.target.value)} placeholder="e.g. Varanasi" className={inputClass("destination")} maxLength={100} />{errors.destination && <p className="mt-1 text-xs text-destructive">{errors.destination}</p>}</div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div><label htmlFor="p-phone" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Phone</label><input id="p-phone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="+91 98765 43210" className={inputClass("phone")} maxLength={16} />{errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}</div>
+          <div><label htmlFor="p-email" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Email</label><input id="p-email" type="email" value={form.email} onChange={e => update("email", e.target.value)} placeholder="you@business.in" className={inputClass("email")} maxLength={255} />{errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}</div>
+        </div>
+        <div><label htmlFor="p-message" className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">Tell us about your business (optional)</label><textarea id="p-message" value={form.message} onChange={e => update("message", e.target.value)} placeholder="Vehicles, routes, room types, experience…" rows={3} className={`w-full rounded-xl border ${errors.message ? "border-destructive" : "border-border"} bg-background px-4 py-3 text-sm font-medium outline-none transition-colors focus:border-primary placeholder:font-normal placeholder:text-muted-foreground`} maxLength={500} /></div>
+        <Button type="submit" className="h-12 w-full rounded-xl text-base">Submit Application <ArrowRight /></Button>
+        <p className="text-center text-xs text-muted-foreground">Prototype only — applications are not stored in this demo.</p>
+      </form>}
+    </div>
+  </div></div></section>;
+}
+
 const benefits = [[Building2, "One Destination, Everything Together", "Find your stay and local travel options in one place."], [CarFront, "Local Travel Options", "Discover cab operators serving the destination and nearby routes."], [ShieldCheck, "Compare Before You Choose", "View different accommodation and operator options."], [Sparkles, "Explore India Locally", "Discover destinations through local stays and travel providers."]];
 
 function WhyTreko() {
@@ -68,5 +141,5 @@ function Footer() {
 function FooterLinks({ title, links }: { title: string; links: string[] }) { return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-3">{links.map(link => <li key={link}><a href="#top" className="text-sm text-background/55 transition-colors hover:text-background">{link}</a></li>)}</ul></div>; }
 
 export function TrekoLanding() {
-  return <main className="overflow-hidden"><Hero /><Destinations /><HowItWorks /><Stays /><CabOperators /><WhyTreko /><Footer /></main>;
+  return <main className="overflow-hidden"><Hero /><Destinations /><HowItWorks /><Stays /><CabOperators /><PartnerSection /><WhyTreko /><Footer /></main>;
 }
