@@ -4,7 +4,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as DestinationsRouteImport } from './routes/destinations'
+import { Route as DestinationsRouteImport } from './routes/destinations/index'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations/$slug'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
