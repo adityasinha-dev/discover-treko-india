@@ -14,6 +14,7 @@ const make = (name: string, state: string, region: string, type: string, descrip
 });
 
 export const destinationDirectory: Destination[] = [
+  make("Ujjain","Madhya Pradesh","Central India","Spiritual","Sacred temples, riverside rituals and centuries of living history.","photo-1600100397608-f01073b8a61f",92,true),
   make("Kashmir","Jammu & Kashmir","North India","Mountains","Lakes, valleys and unforgettable Himalayan stays.","photo-1506377247377-2a5b3b417ebb",98,true),
   make("Manali","Himachal Pradesh","North India","Adventure","Pine valleys, mountain roads and alpine adventures.","photo-1506905925346-21bda4d32df4",96,true),
   make("Shimla","Himachal Pradesh","North India","Hill Stations","Colonial charm and cool mountain escapes.","photo-1518002054494-4f6f94352b7a",85),
