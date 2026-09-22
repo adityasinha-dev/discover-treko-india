@@ -7,7 +7,7 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTi
 import { destinations, indianPlaces, operators, stays } from "@/data/treko";
 
 const nav = [
-  ["Explore Destinations", "/explore"], ["Stays", "#stays"], ["Cab Operators", "#cabs"], ["How It Works", "#how-it-works"], ["Become a Partner", "#partner"], ["About", "#about"],
+  ["Home", "#top"], ["Explore Destinations", "/explore"], ["Stays", "#stays"], ["Cab Operators", "#cabs"], ["How It Works", "#how-it-works"], ["Become a Partner", "#partner"], ["About", "#about"],
 ];
 
 function Logo() {
