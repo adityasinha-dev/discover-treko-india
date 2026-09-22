@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const nav = [
+  { label: "Home", to: "/" as const },
   { label: "Explore Destinations", to: "/explore" as const },
   { label: "Stays", hash: "stays" },
   { label: "Cab Operators", hash: "cabs" },
