@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
-import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, Search, ShieldCheck, Sparkles, Star, UserRound } from "lucide-react";
+import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Sparkles, Star, UserRound } from "lucide-react";
 import heroImage from "@/assets/hero-ujjain.jpg";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { destinations, indianPlaces, operators, stays } from "@/data/treko";
+import { destinations, operators, stays } from "@/data/treko";
 
 const nav = [
   ["Home", "#top"], ["Explore Destinations", "/explore"], ["Stays", "#stays"], ["Cab Operators", "#cabs"], ["How It Works", "#how-it-works"], ["Become a Partner", "#partner"], ["About", "#about"],
