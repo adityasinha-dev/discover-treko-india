@@ -39,3 +39,5 @@ export const operators = [
   { initials: "HR", name: "Himalayan Route Travels", serving: "Manali • Solang • Kasol • Rohtang", vehicles: "Hatchback • SUV • Traveller", services: "Local Tours • Mountain Routes • Transfers", rating: "4.8", price: "Contact for price" },
   { initials: "JP", name: "Pink City Cabs", serving: "Jaipur • Ajmer • Pushkar • Ranthambore", vehicles: "Sedan • SUV • Premium", services: "City Tours • Outstation • Airport Transfer", rating: "4.6", price: "From ₹1,500" },
 ];
+
+export { destinationDirectory, destinationTypes, type Destination } from "@/data/destinations";
