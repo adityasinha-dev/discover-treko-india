@@ -17,7 +17,7 @@ function Hero({ destination }: { destination: DestinationDetails }) {
 }
 
 function Places({ destination }: { destination: DestinationDetails }) {
-  return <section><SectionHeading label="See & experience" title="Places to Visit" description={`Make time for these memorable corners of ${destination.name}.`} /><div className="grid gap-5 md:grid-cols-3">{destination.placesToVisit.map(place => <article key={place.name} className="overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card"><span className="tag">{place.tag ?? "Discover"}</span><h3 className="mt-5 font-display text-2xl font-semibold">{place.name}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{place.description}</p></article>)}</div></section>;
+  return <section><SectionHeading label="See & experience" title="Places to Visit" description={`Make time for these memorable corners of ${destination.name}.`} /><div className="grid gap-5 md:grid-cols-3">{destination.placesToVisit.map(place => <article key={place.name} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"><img src={destination.image} alt={place.name} className="aspect-[16/9] w-full object-cover transition-transform duration-500 group-hover:scale-105" /><div className="p-5"><span className="tag">{place.tag ?? "Discover"}</span><h3 className="mt-5 font-display text-2xl font-semibold">{place.name}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{place.description}</p></div></article>)}</div></section>;
 }
 
 function Stays({ destination }: { destination: DestinationDetails }) {
