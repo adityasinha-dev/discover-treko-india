@@ -35,8 +35,8 @@ export function TrekoNavbar({ overlay = false }: { overlay?: boolean }) {
           {nav.map(item => item.to ? <Link key={item.label} to={item.to} activeProps={{ className: "text-primary" }} className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary">{item.label}</Link> : <HomeSectionLink key={item.label} label={item.label} hash={item.hash ?? ""} />)}
         </nav>
         <div className="hidden items-center gap-3 lg:flex">
-          <Button variant="ghost">Login</Button>
-          <Button asChild className="rounded-full px-5"><Link to="/explore">Start Exploring <ArrowRight /></Link></Button>
+          <Button asChild variant="ghost"><Link to="/login">Login</Link></Button>
+          <Button asChild className="rounded-full px-5"><Link to="/signup">Get Started <ArrowRight /></Link></Button>
         </div>
         <Sheet>
           <SheetTrigger asChild><Button size="icon" variant="outline" className="rounded-full lg:hidden" aria-label="Open navigation"><Menu /></Button></SheetTrigger>
