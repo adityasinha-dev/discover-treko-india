@@ -6,8 +6,8 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTi
 const nav = [
   { label: "Home", to: "/" as const },
   { label: "Explore Destinations", to: "/explore" as const },
-  { label: "Stays", hash: "stays" },
-  { label: "Cab Operators", hash: "cabs" },
+  { label: "Stays", to: "/stays" as const },
+  { label: "Cab Operators", to: "/cab-operators" as const },
   { label: "How It Works", hash: "how-it-works" },
   { label: "Become a Partner", hash: "partner" },
   { label: "About", hash: "about" },
@@ -53,8 +53,8 @@ export function TrekoNavbar({ overlay = false }: { overlay?: boolean }) {
   );
 }
 
-function FooterLinks({ title, links }: { title: string; links: string[] }) {
-  return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-3">{links.map(link => <li key={link}><Link to={link === "Destinations" ? "/explore" : "/"} className="text-sm text-background/55 transition-colors hover:text-background">{link}</Link></li>)}</ul></div>;
+function FooterLinks({ title, links }: { title: string; links: { label: string; to: "/" | "/explore" | "/stays" | "/cab-operators" }[] }) {
+  return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-3">{links.map(link => <li key={link.label}><Link to={link.to} className="text-sm text-background/55 transition-colors hover:text-background">{link.label}</Link></li>)}</ul></div>;
 }
 
 export function TrekoFooter() {
@@ -69,9 +69,9 @@ export function TrekoFooter() {
       <div className="border-t border-background/10">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:px-8">
           <div><div className="inline-flex rounded-md bg-background p-1"><TrekoLogo /></div><p className="mt-5 max-w-xs text-sm leading-6 text-background/55">India-focused discovery for stays and trusted local cab operators.</p></div>
-          <FooterLinks title="Explore" links={["Destinations", "Stays", "Cab Operators"]} />
-          <FooterLinks title="Company" links={["About Treko", "Become a Partner", "Contact"]} />
-          <FooterLinks title="Support" links={["Help", "FAQs", "Terms", "Privacy"]} />
+          <FooterLinks title="Explore" links={[{ label: "Destinations", to: "/explore" }, { label: "Stays", to: "/stays" }, { label: "Cab Operators", to: "/cab-operators" }]} />
+          <FooterLinks title="Company" links={[{ label: "About Treko", to: "/" }, { label: "Become a Partner", to: "/" }, { label: "Contact", to: "/" }]} />
+          <FooterLinks title="Support" links={[{ label: "Help", to: "/" }, { label: "FAQs", to: "/" }, { label: "Terms", to: "/" }, { label: "Privacy", to: "/" }]} />
         </div>
         <div className="mx-auto flex max-w-7xl flex-col gap-2 border-t border-background/10 px-5 py-6 text-xs text-background/45 sm:flex-row sm:justify-between md:px-8"><p>© 2026 Treko. College project prototype.</p><p>Made for journeys across India.</p></div>
       </div>
