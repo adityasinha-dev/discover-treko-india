@@ -8,6 +8,8 @@ import { Route as DestinationsRouteImport } from './routes/destinations/index'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations/$slug'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as StaysRouteImport } from './routes/stays'
+import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
 
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 const ExploreRoute = ExploreRouteImport.update({ id: '/explore', path: '/explore', getParentRoute: () => rootRouteImport } as any)
@@ -15,12 +17,14 @@ const DestinationsRoute = DestinationsRouteImport.update({ id: '/destinations', 
 const DestinationsSlugRoute = DestinationsSlugRouteImport.update({ id: '/destinations/$slug', path: '/destinations/$slug', getParentRoute: () => rootRouteImport } as any)
 const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
 const SignupRoute = SignupRouteImport.update({ id: '/signup', path: '/signup', getParentRoute: () => rootRouteImport } as any)
+const StaysRoute = StaysRouteImport.update({ id: '/stays', path: '/stays', getParentRoute: () => rootRouteImport } as any)
+const CabOperatorsRoute = CabOperatorsRouteImport.update({ id: '/cab-operators', path: '/cab-operators', getParentRoute: () => rootRouteImport } as any)
 
-export interface FileRoutesByFullPath { '/': typeof IndexRoute; '/destinations': typeof DestinationsRoute; '/destinations/$slug': typeof DestinationsSlugRoute; '/explore': typeof ExploreRoute; '/login': typeof LoginRoute; '/signup': typeof SignupRoute }
+export interface FileRoutesByFullPath { '/': typeof IndexRoute; '/destinations': typeof DestinationsRoute; '/destinations/$slug': typeof DestinationsSlugRoute; '/explore': typeof ExploreRoute; '/login': typeof LoginRoute; '/signup': typeof SignupRoute; '/stays': typeof StaysRoute; '/cab-operators': typeof CabOperatorsRoute }
 export interface FileRoutesByTo { '/': typeof IndexRoute; '/destinations': typeof DestinationsRoute; '/destinations/$slug': typeof DestinationsSlugRoute; '/explore': typeof ExploreRoute; '/login': typeof LoginRoute; '/signup': typeof SignupRoute }
 export interface FileRoutesById { __root__: typeof rootRouteImport; '/': typeof IndexRoute; '/destinations': typeof DestinationsRoute; '/destinations/$slug': typeof DestinationsSlugRoute; '/explore': typeof ExploreRoute; '/login': typeof LoginRoute; '/signup': typeof SignupRoute }
-export interface FileRouteTypes { fileRoutesByFullPath: FileRoutesByFullPath; fullPaths: '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup'; fileRoutesByTo: FileRoutesByTo; to: '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup'; id: '__root__' | '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup'; fileRoutesById: FileRoutesById }
-export interface RootRouteChildren { IndexRoute: typeof IndexRoute; DestinationsRoute: typeof DestinationsRoute; DestinationsSlugRoute: typeof DestinationsSlugRoute; ExploreRoute: typeof ExploreRoute; LoginRoute: typeof LoginRoute; SignupRoute: typeof SignupRoute }
+export interface FileRouteTypes { fileRoutesByFullPath: FileRoutesByFullPath; fullPaths: '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup' | '/stays' | '/cab-operators'; fileRoutesByTo: FileRoutesByTo; to: '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup'; id: '__root__' | '/' | '/destinations' | '/destinations/$slug' | '/explore' | '/login' | '/signup'; fileRoutesById: FileRoutesById }
+export interface RootRouteChildren { IndexRoute: typeof IndexRoute; DestinationsRoute: typeof DestinationsRoute; DestinationsSlugRoute: typeof DestinationsSlugRoute; ExploreRoute: typeof ExploreRoute; LoginRoute: typeof LoginRoute; SignupRoute: typeof SignupRoute; StaysRoute: typeof StaysRoute; CabOperatorsRoute: typeof CabOperatorsRoute }
 declare module '@tanstack/react-router' { interface FileRoutesByPath {
   '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
   '/destinations': { id: '/destinations'; path: '/destinations'; fullPath: '/destinations'; preLoaderRoute: typeof DestinationsRouteImport; parentRoute: typeof rootRouteImport }
@@ -28,8 +32,10 @@ declare module '@tanstack/react-router' { interface FileRoutesByPath {
   '/explore': { id: '/explore'; path: '/explore'; fullPath: '/explore'; preLoaderRoute: typeof ExploreRouteImport; parentRoute: typeof rootRouteImport }
   '/login': { id: '/login'; path: '/login'; fullPath: '/login'; preLoaderRoute: typeof LoginRouteImport; parentRoute: typeof rootRouteImport }
   '/signup': { id: '/signup'; path: '/signup'; fullPath: '/signup'; preLoaderRoute: typeof SignupRouteImport; parentRoute: typeof rootRouteImport }
+  '/stays': { id: '/stays'; path: '/stays'; fullPath: '/stays'; preLoaderRoute: typeof StaysRouteImport; parentRoute: typeof rootRouteImport }
+  '/cab-operators': { id: '/cab-operators'; path: '/cab-operators'; fullPath: '/cab-operators'; preLoaderRoute: typeof CabOperatorsRouteImport; parentRoute: typeof rootRouteImport }
 } }
-const rootRouteChildren: RootRouteChildren = { IndexRoute, DestinationsRoute, DestinationsSlugRoute, ExploreRoute, LoginRoute, SignupRoute }
+const rootRouteChildren: RootRouteChildren = { IndexRoute, DestinationsRoute, DestinationsSlugRoute, ExploreRoute, LoginRoute, SignupRoute, StaysRoute, CabOperatorsRoute }
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
 import type { getRouter } from './router.tsx'
 import type { startInstance } from './start.ts'
