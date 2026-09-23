@@ -10,69 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as StaysRouteImport } from './routes/stays'
 import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
-import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as StaysRouteImport } from './routes/stays'
+import { Route as DestinationIdRouteImport } from './routes/destination/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExploreRoute = ExploreRouteImport.update({ id: '/explore', path: '/explore', getParentRoute: () => rootRouteImport } as any)
-const StaysRoute = StaysRouteImport.update({ id: '/stays', path: '/stays', getParentRoute: () => rootRouteImport } as any)
-const CabOperatorsRoute = CabOperatorsRouteImport.update({ id: '/cab-operators', path: '/cab-operators', getParentRoute: () => rootRouteImport } as any)
-const PartnerRoute = PartnerRouteImport.update({ id: '/partner', path: '/partner', getParentRoute: () => rootRouteImport } as any)
-const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
-const RegisterRoute = RegisterRouteImport.update({ id: '/register', path: '/register', getParentRoute: () => rootRouteImport } as any)
+const CabOperatorsRoute = CabOperatorsRouteImport.update({
+  id: '/cab-operators',
+  path: '/cab-operators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaysRoute = StaysRouteImport.update({
+  id: '/stays',
+  path: '/stays',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinationIdRoute = DestinationIdRouteImport.update({
+  id: '/destination/$id',
+  path: '/destination/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/register': typeof RegisterRoute
-  '/login': typeof LoginRoute
   '/': typeof IndexRoute
-  '/explore': typeof ExploreRoute
-  '/stays': typeof StaysRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/explore': typeof ExploreRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
+  '/register': typeof RegisterRoute
+  '/stays': typeof StaysRoute
+  '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesByTo {
-  '/register': typeof RegisterRoute
-  '/login': typeof LoginRoute
   '/': typeof IndexRoute
-  '/explore': typeof ExploreRoute
-  '/stays': typeof StaysRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/explore': typeof ExploreRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
+  '/register': typeof RegisterRoute
+  '/stays': typeof StaysRoute
+  '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesById {
-  '/register': typeof RegisterRoute
-  '/login': typeof LoginRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/explore': typeof ExploreRoute
-  '/stays': typeof StaysRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/explore': typeof ExploreRoute
+  '/login': typeof LoginRoute
   '/partner': typeof PartnerRoute
+  '/register': typeof RegisterRoute
+  '/stays': typeof StaysRoute
+  '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/cab-operators'
+    | '/explore'
+    | '/login'
+    | '/partner'
+    | '/register'
+    | '/stays'
+    | '/destination/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
-  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
+  to:
+    | '/'
+    | '/cab-operators'
+    | '/explore'
+    | '/login'
+    | '/partner'
+    | '/register'
+    | '/stays'
+    | '/destination/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/cab-operators'
+    | '/explore'
+    | '/login'
+    | '/partner'
+    | '/register'
+    | '/stays'
+    | '/destination/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ExploreRoute: typeof ExploreRoute
-  StaysRoute: typeof StaysRoute
   CabOperatorsRoute: typeof CabOperatorsRoute
-  PartnerRoute: typeof PartnerRoute
+  ExploreRoute: typeof ExploreRoute
   LoginRoute: typeof LoginRoute
+  PartnerRoute: typeof PartnerRoute
   RegisterRoute: typeof RegisterRoute
+  StaysRoute: typeof StaysRoute
+  DestinationIdRoute: typeof DestinationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -84,59 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-  '/partner': {
-      id: '/partner'
-      path: '/partner'
-      fullPath: '/partner'
-      preLoaderRoute: typeof PartnerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  '/cab-operators': {
+    '/cab-operators': {
       id: '/cab-operators'
       path: '/cab-operators'
       fullPath: '/cab-operators'
       preLoaderRoute: typeof CabOperatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-  '/stays': {
-      id: '/stays'
-      path: '/stays'
-      fullPath: '/stays'
-      preLoaderRoute: typeof StaysRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  '/explore': {
+    '/explore': {
       id: '/explore'
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
-  '/login': {
-    id: '/login'
-    path: '/login'
-    fullPath: '/login'
-    preLoaderRoute: typeof LoginRouteImport
-    parentRoute: typeof rootRouteImport
-  }
-  '/register': {
-    id: '/register'
-    path: '/register'
-    fullPath: '/register'
-    preLoaderRoute: typeof RegisterRouteImport
-    parentRoute: typeof rootRouteImport
-  }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stays': {
+      id: '/stays'
+      path: '/stays'
+      fullPath: '/stays'
+      preLoaderRoute: typeof StaysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destination/$id': {
+      id: '/destination/$id'
+      path: '/destination/$id'
+      fullPath: '/destination/$id'
+      preLoaderRoute: typeof DestinationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ExploreRoute: ExploreRoute,
-  StaysRoute: StaysRoute,
   CabOperatorsRoute: CabOperatorsRoute,
-  PartnerRoute: PartnerRoute,
+  ExploreRoute: ExploreRoute,
   LoginRoute: LoginRoute,
+  PartnerRoute: PartnerRoute,
   RegisterRoute: RegisterRoute,
+  StaysRoute: StaysRoute,
+  DestinationIdRoute: DestinationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

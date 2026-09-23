@@ -1,21 +1,25 @@
-# Routes
+Treko – Smart Travel Planning
 
-TanStack Start uses **file-based routing**. Every `.tsx` file in this directory
-defines a route. Do **not** create `src/pages/`, `src/routes/_app/index.tsx`, or
-`app/layout.tsx` — those are Next.js / Remix conventions. The only root layout
-is `src/routes/__root.tsx`.
+Treko is a travel planning platform focused on simplifying travel within India by bringing destinations, stays, cab operators, and local guides together in one place.
 
-## Conventions
+✨ Features
 
-| File | URL |
-| --- | --- |
-| `index.tsx` | `/` |
-| `about.tsx` | `/about` |
-| `users/index.tsx` | `/users` |
-| `users/$id.tsx` | `/users/:id` (dynamic — bare `$`, no curly braces) |
-| `posts/{-$category}.tsx` | `/posts/:category?` (optional segment) |
-| `files/$.tsx` | `/files/*` (splat — read via `_splat` param, never `*`) |
-| `_layout.tsx` | layout route (renders children via `<Outlet />`) |
-| `__root.tsx` | app shell — wraps every page; preserve `<Outlet />` |
+- 🇮🇳 Explore popular destinations across India
+- 🏨 Browse stays and hotels
+- 🚕 Explore cab operators
+- 🧑‍💼 Discover local guides
+- 📦 Select stays, cabs, and guides for a travel package
+- 🔐 User Login & Account Creation
+- 🤝 Become a Partner
 
-`routeTree.gen.ts` is auto-generated. Don't edit it by hand.
+🚀 Live Demo
+
+👉 "View Treko Live Demo" (https://discover-treko-india.vercel.app/)
+
+🛠️ Tech Stack
+
+Frontend: React, TypeScript, Tailwind CSS
+Backend: Node.js, Express.js
+Database: MongoDB
+
+«Treko is currently being developed as a college project and is continuously evolving.»
