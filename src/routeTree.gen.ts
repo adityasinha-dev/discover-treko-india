@@ -14,6 +14,8 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as StaysRouteImport } from './routes/stays'
 import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,8 +26,12 @@ const ExploreRoute = ExploreRouteImport.update({ id: '/explore', path: '/explore
 const StaysRoute = StaysRouteImport.update({ id: '/stays', path: '/stays', getParentRoute: () => rootRouteImport } as any)
 const CabOperatorsRoute = CabOperatorsRouteImport.update({ id: '/cab-operators', path: '/cab-operators', getParentRoute: () => rootRouteImport } as any)
 const PartnerRoute = PartnerRouteImport.update({ id: '/partner', path: '/partner', getParentRoute: () => rootRouteImport } as any)
+const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
+const RegisterRoute = RegisterRouteImport.update({ id: '/register', path: '/register', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
+  '/register': typeof RegisterRoute
+  '/login': typeof LoginRoute
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
   '/stays': typeof StaysRoute
@@ -33,6 +39,8 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRoute
 }
 export interface FileRoutesByTo {
+  '/register': typeof RegisterRoute
+  '/login': typeof LoginRoute
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
   '/stays': typeof StaysRoute
@@ -40,6 +48,8 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerRoute
 }
 export interface FileRoutesById {
+  '/register': typeof RegisterRoute
+  '/login': typeof LoginRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
@@ -49,10 +59,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
+  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
-  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
+  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
+  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -61,6 +71,8 @@ export interface RootRouteChildren {
   StaysRoute: typeof StaysRoute
   CabOperatorsRoute: typeof CabOperatorsRoute
   PartnerRoute: typeof PartnerRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -100,6 +112,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
+  '/login': {
+    id: '/login'
+    path: '/login'
+    fullPath: '/login'
+    preLoaderRoute: typeof LoginRouteImport
+    parentRoute: typeof rootRouteImport
+  }
+  '/register': {
+    id: '/register'
+    path: '/register'
+    fullPath: '/register'
+    preLoaderRoute: typeof RegisterRouteImport
+    parentRoute: typeof rootRouteImport
+  }
   }
 }
 
@@ -109,6 +135,8 @@ const rootRouteChildren: RootRouteChildren = {
   StaysRoute: StaysRoute,
   CabOperatorsRoute: CabOperatorsRoute,
   PartnerRoute: PartnerRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
