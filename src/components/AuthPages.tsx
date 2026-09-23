@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ type FormErrors = {
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AuthShell({ children, eyebrow, title, description }: {
-  children: React.ReactNode;
+  children: ReactNode;
   eyebrow: string;
   title: string;
   description: string;
