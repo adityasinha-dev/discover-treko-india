@@ -117,10 +117,10 @@ export function LoginPage() {
       <form noValidate onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="login-email" className="text-sm font-semibold text-foreground">Email</label>
-          <Input id="login-email" name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(event) => { setEmail(event.target.value); setErrors((current) => ({ ...current, email: undefined, form: undefined })); }} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} className="mt-2 h-11" />
+          <Input id="login-email" name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(event) => { setEmail(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} className="mt-2 h-11" />
           <FieldError id="login-email-error" message={errors.email} />
         </div>
-        <PasswordField id="login-password" label="Password" value={password} onChange={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined, form: undefined })); }} error={errors.password} autoComplete="current-password" />
+        <PasswordField id="login-password" label="Password" value={password} onChange={(value) => { setPassword(value); setErrors({}); }} error={errors.password} autoComplete="current-password" />
         {errors.form && <p role="alert" className="text-sm font-medium text-destructive">{errors.form}</p>}
         <Button type="submit" disabled={submitting} className="h-12 w-full rounded-full text-base">{submitting ? "Logging in…" : "Login"} {!submitting && <ArrowRight />}</Button>
       </form>
@@ -142,7 +142,8 @@ export function RegisterPage() {
     event.preventDefault();
     const nextErrors: FormErrors = {};
     if (!fullName.trim()) nextErrors.fullName = "Enter your full name.";
-    nextErrors.email = validateEmail(email);
+    const emailError = validateEmail(email);
+    if (emailError) nextErrors.email = emailError;
     if (password.length < 8) nextErrors.password = "Use at least 8 characters for your password.";
     if (!confirmPassword) nextErrors.confirmPassword = "Confirm your password.";
     else if (password !== confirmPassword) nextErrors.confirmPassword = "Passwords do not match.";
@@ -165,16 +166,16 @@ export function RegisterPage() {
       <form noValidate onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="register-name" className="text-sm font-semibold text-foreground">Full Name</label>
-          <Input id="register-name" name="name" autoComplete="name" value={fullName} onChange={(event) => { setFullName(event.target.value); setErrors((current) => ({ ...current, fullName: undefined, form: undefined })); }} aria-invalid={Boolean(errors.fullName)} aria-describedby={errors.fullName ? "register-name-error" : undefined} className="mt-2 h-11" />
+          <Input id="register-name" name="name" autoComplete="name" value={fullName} onChange={(event) => { setFullName(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.fullName)} aria-describedby={errors.fullName ? "register-name-error" : undefined} className="mt-2 h-11" />
           <FieldError id="register-name-error" message={errors.fullName} />
         </div>
         <div>
           <label htmlFor="register-email" className="text-sm font-semibold text-foreground">Email</label>
-          <Input id="register-email" name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(event) => { setEmail(event.target.value); setErrors((current) => ({ ...current, email: undefined, form: undefined })); }} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "register-email-error" : undefined} className="mt-2 h-11" />
+          <Input id="register-email" name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(event) => { setEmail(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "register-email-error" : undefined} className="mt-2 h-11" />
           <FieldError id="register-email-error" message={errors.email} />
         </div>
-        <PasswordField id="register-password" label="Password" value={password} onChange={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined, form: undefined })); }} error={errors.password} autoComplete="new-password" />
-        <PasswordField id="register-confirm-password" label="Confirm Password" value={confirmPassword} onChange={(value) => { setConfirmPassword(value); setErrors((current) => ({ ...current, confirmPassword: undefined, form: undefined })); }} error={errors.confirmPassword} autoComplete="new-password" />
+        <PasswordField id="register-password" label="Password" value={password} onChange={(value) => { setPassword(value); setErrors({}); }} error={errors.password} autoComplete="new-password" />
+        <PasswordField id="register-confirm-password" label="Confirm Password" value={confirmPassword} onChange={(value) => { setConfirmPassword(value); setErrors({}); }} error={errors.confirmPassword} autoComplete="new-password" />
         {errors.form && <p role="alert" className="text-sm font-medium text-destructive">{errors.form}</p>}
         <Button type="submit" disabled={submitting} className="h-12 w-full rounded-full text-base">{submitting ? "Creating account…" : "Create Account"} {!submitting && <ArrowRight />}</Button>
       </form>
