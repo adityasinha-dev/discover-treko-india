@@ -1,5 +1,4 @@
 import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Sparkles, Star } from "lucide-react";
-import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Sparkles, Star } from "lucide-react";
 import heroImage from "@/assets/hero-ujjain.jpg";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
