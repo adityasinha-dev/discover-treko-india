@@ -1,29 +1,25 @@
-# Welcome to your Lovable project
+Treko – Smart Travel Planning
 
-This project was built with [Lovable](https://lovable.dev).
+Treko is a travel planning platform focused on simplifying travel within India by bringing destinations, stays, cab operators, and local guides together in one place.
 
-## Build with Lovable
+✨ Features
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+- 🇮🇳 Explore popular destinations across India
+- 🏨 Browse stays and hotels
+- 🚕 Explore cab operators
+- 🧑‍💼 Discover local guides
+- 📦 Select stays, cabs, and guides for a travel package
+- 🔐 User Login & Account Creation
+- 🤝 Become a Partner
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+🚀 Live Demo
 
-## Development
+👉 [View Treko Live Demo](https://discover-treko-india.vercel.app/)
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+🛠️ Tech Stack
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+Frontend: React, TypeScript, Tailwind CSS
+Backend: Node.js, Express.js
+Database: MongoDB
 
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+«Treko is currently being developed as a college project and is continuously evolving.»

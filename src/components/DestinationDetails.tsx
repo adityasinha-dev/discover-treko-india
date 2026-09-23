@@ -14,7 +14,17 @@ function SectionTitle({ icon: Icon, title, copy }: { icon: typeof BedDouble; tit
 }
 
 function StayCard({ stay, selected, onSelect }: { stay: ReturnType<typeof getStaysForDestination>[number]; selected: boolean; onSelect: () => void }) {
-  return <article className="overflow-hidden rounded-2xl bg-card shadow-card"><div className="aspect-[4/3] overflow-hidden"><img src={stay.image} alt={stay.name} className="h-full w-full object-cover" /></div><div className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase text-primary">{stay.type}</p><h3 className="mt-1 font-display text-xl font-semibold">{stay.name}</h3><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3" />{stay.location}</p></div><span className="flex items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary" />{stay.rating}</span></div><div className="my-4 flex flex-wrap gap-2">{stay.amenities.map((amenity) => <span className="tag" key={amenity}><Check />{amenity}</span>)}</div><div className="flex items-center justify-between border-t border-border pt-4"><p className="font-display text-xl font-bold">{stay.price}<span className="text-xs font-normal text-muted-foreground"> / night</span></p><Button size="sm" variant={selected ? "default" : "outline"} onClick={onSelect}>{selected ? "Selected" : "Select stay"}</Button></div></div></article>;
+  return <article className="overflow-hidden rounded-2xl bg-card shadow-card"><div className="aspect-[4/3] overflow-hidden">
+   <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">
+  {stay.images.map((image, index) => (
+    <img
+      key={`${stay.id}-${index}`}
+      src={image}
+      alt={`${stay.name}, photo ${index + 1}`}
+      className="aspect-[16/10] w-full shrink-0 snap-center rounded-xl object-cover"
+    />
+  ))}
+</div></div><div className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase text-primary">{stay.type}</p><h3 className="mt-1 font-display text-xl font-semibold">{stay.name}</h3><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3" />{stay.location}</p></div><span className="flex items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary" />{stay.rating}</span></div><div className="my-4 flex flex-wrap gap-2">{stay.amenities.map((amenity) => <span className="tag" key={amenity}><Check />{amenity}</span>)}</div><div className="flex items-center justify-between border-t border-border pt-4"><p className="font-display text-xl font-bold">{stay.price}<span className="text-xs font-normal text-muted-foreground"> / night</span></p><Button size="sm" variant={selected ? "default" : "outline"} onClick={onSelect}>{selected ? "Selected" : "Select stay"}</Button></div></div></article>;
 }
 
 export function DestinationDetailsPage() {

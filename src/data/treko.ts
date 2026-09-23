@@ -5,6 +5,7 @@ import rishikeshImage from "@/assets/destination-rishikesh.jpg";
 import jaipurStay from "@/assets/stay-jaipur.jpg";
 import rishikeshStay from "@/assets/stay-rishikesh.jpg";
 import ujjainStay from "@/assets/stay-ujjain.jpg";
+import ujjainImage from "@/assets/hero-ujjain.jpg";
 
 export const indianPlaces = [
   "Ujjain, Madhya Pradesh",
@@ -29,7 +30,7 @@ export const destinations = [
   { id: "udaipur", name: "Udaipur", state: "Rajasthan", description: "Lakeside palaces, old city lanes and Aravalli views.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "agra", name: "Agra", state: "Uttar Pradesh", description: "Mughal landmarks and the marble wonder of the Taj Mahal.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "varanasi", name: "Varanasi", state: "Uttar Pradesh", description: "Ancient ghats, riverside rituals and storied lanes.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainStay },
+  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainImage },
   { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage },
   { id: "manali", name: "Manali", state: "Himachal Pradesh", description: "Mountain roads, pine valleys and Himalayan escapes.", stays: "85+ stays", cabs: "24 cab operators", image: manaliImage },
   { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
@@ -45,7 +46,7 @@ export const destinations = [
 ];
 
 export const stays = [
-  { id: "mahakal-residency", destinationId: "ujjain", name: "Mahakal Residency", location: "Ujjain, Madhya Pradesh", type: "Hotel", rating: "4.6", price: "₹2,499", amenities: ["Breakfast", "Wi-Fi", "Temple transfer"], image: ujjainStay },
+  { id: "mahakal-residency", destinationId: "ujjain", name: "Mahakal Residency", location: "Ujjain, Madhya Pradesh", type: "Hotel", rating: "4.6", price: "₹2,499", amenities: ["Breakfast", "Wi-Fi", "Temple transfer"], image: ujjainImage, images: [ujjainStay, ujjainImage] },
   { id: "ganga-vista-retreat", destinationId: "rishikesh", name: "Ganga Vista Retreat", location: "Rishikesh, Uttarakhand", type: "Riverside resort", rating: "4.7", price: "₹4,200", amenities: ["River view", "Yoga deck", "Parking"], image: rishikeshStay },
   { id: "amber-courtyard-haveli", destinationId: "jaipur", name: "Amber Courtyard Haveli", location: "Jaipur, Rajasthan", type: "Heritage stay", rating: "4.8", price: "₹3,850", amenities: ["Breakfast", "Courtyard", "Local tours"], image: jaipurStay },
 ];
