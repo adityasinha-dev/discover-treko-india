@@ -16,6 +16,7 @@ import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as DestinationRouteImport } from './routes/destination.$destinationId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,8 +29,10 @@ const CabOperatorsRoute = CabOperatorsRouteImport.update({ id: '/cab-operators',
 const PartnerRoute = PartnerRouteImport.update({ id: '/partner', path: '/partner', getParentRoute: () => rootRouteImport } as any)
 const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
 const RegisterRoute = RegisterRouteImport.update({ id: '/register', path: '/register', getParentRoute: () => rootRouteImport } as any)
+const DestinationRoute = DestinationRouteImport.update({ id: '/destination/$destinationId', path: '/destination/$destinationId', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
+  '/destination/$destinationId': typeof DestinationRoute
   '/register': typeof RegisterRoute
   '/login': typeof LoginRoute
   '/': typeof IndexRoute
@@ -39,6 +42,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRoute
 }
 export interface FileRoutesByTo {
+  '/destination/$destinationId': typeof DestinationRoute
   '/register': typeof RegisterRoute
   '/login': typeof LoginRoute
   '/': typeof IndexRoute
@@ -48,6 +52,7 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerRoute
 }
 export interface FileRoutesById {
+  '/destination/$destinationId': typeof DestinationRoute
   '/register': typeof RegisterRoute
   '/login': typeof LoginRoute
   __root__: typeof rootRouteImport
@@ -59,10 +64,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
+  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register' | '/destination/$destinationId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
-  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register'
+  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register' | '/destination/$destinationId'
+  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner' | '/login' | '/register' | '/destination/$destinationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -73,6 +78,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  DestinationRoute: typeof DestinationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +132,13 @@ declare module '@tanstack/react-router' {
     preLoaderRoute: typeof RegisterRouteImport
     parentRoute: typeof rootRouteImport
   }
+  '/destination/$destinationId': {
+    id: '/destination/$destinationId'
+    path: '/destination/$destinationId'
+    fullPath: '/destination/$destinationId'
+    preLoaderRoute: typeof DestinationRouteImport
+    parentRoute: typeof rootRouteImport
+  }
   }
 }
 
@@ -137,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  DestinationRoute: DestinationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
