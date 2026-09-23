@@ -10,33 +10,57 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as StaysRouteImport } from './routes/stays'
+import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
+import { Route as PartnerRouteImport } from './routes/partner'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExploreRoute = ExploreRouteImport.update({ id: '/explore', path: '/explore', getParentRoute: () => rootRouteImport } as any)
+const StaysRoute = StaysRouteImport.update({ id: '/stays', path: '/stays', getParentRoute: () => rootRouteImport } as any)
+const CabOperatorsRoute = CabOperatorsRouteImport.update({ id: '/cab-operators', path: '/cab-operators', getParentRoute: () => rootRouteImport } as any)
+const PartnerRoute = PartnerRouteImport.update({ id: '/partner', path: '/partner', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/stays': typeof StaysRoute
+  '/cab-operators': typeof CabOperatorsRoute
+  '/partner': typeof PartnerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/stays': typeof StaysRoute
+  '/cab-operators': typeof CabOperatorsRoute
+  '/partner': typeof PartnerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/stays': typeof StaysRoute
+  '/cab-operators': typeof CabOperatorsRoute
+  '/partner': typeof PartnerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
+  id: '__root__' | '/' | '/explore' | '/stays' | '/cab-operators' | '/partner'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExploreRoute: typeof ExploreRoute
+  StaysRoute: typeof StaysRoute
+  CabOperatorsRoute: typeof CabOperatorsRoute
+  PartnerRoute: typeof PartnerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +72,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+  '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  '/cab-operators': {
+      id: '/cab-operators'
+      path: '/cab-operators'
+      fullPath: '/cab-operators'
+      preLoaderRoute: typeof CabOperatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  '/stays': {
+      id: '/stays'
+      path: '/stays'
+      fullPath: '/stays'
+      preLoaderRoute: typeof StaysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExploreRoute: ExploreRoute,
+  StaysRoute: StaysRoute,
+  CabOperatorsRoute: CabOperatorsRoute,
+  PartnerRoute: PartnerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
