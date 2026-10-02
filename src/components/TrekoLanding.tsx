@@ -1,31 +1,285 @@
-import { ArrowRight, BedDouble, Building2, CarFront, Check, ChevronRight, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, BedDouble, Building2, CarFront, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 import heroImage from "@/assets/hero-ujjain.jpg";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { destinations, indianPlaces, operators, stays } from "@/data/treko";
+import { destinations } from "@/data/treko";
+import { getCurrentUser, logoutDemo, type TrekoUser } from "@/lib/auth";
 
 const nav = [
-  ["Home", "/"], ["Explore Destinations", "/explore"], ["Stays", "/stays"], ["Cabs", "/cab-operators"], ["Become a Partner", "/partner"],
+  ["Home", "/"],
+  ["Explore Destinations", "/explore"],
+  ["My Plans", "/my-plans"],
+  ["Stays", "/stays"],
+  ["Cabs", "/cab-operators"],
+  ["Become a Partner", "/partner"],
 ];
 
 export function Logo() {
-  return <a href="/" className="flex items-center gap-2.5" aria-label="Treko home"><span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground"><Route className="size-4" /></span><span className="font-display text-xl font-bold text-foreground">Treko</span></a>;
+  return (
+    <a href="/" className="flex items-center gap-2.5" aria-label="Treko home">
+      <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground">
+        <Route className="size-4" />
+      </span>
+      <span className="font-display text-xl font-bold text-foreground">Treko</span>
+    </a>
+  );
 }
 
 export function Navbar() {
-  return <header className="absolute inset-x-0 top-0 z-40"><div className="mx-auto grid h-20 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center px-5 lg:grid-cols-[auto_1fr_auto] lg:px-8"><Logo /><nav className="hidden items-center justify-center gap-7 lg:flex">{nav.map(([label, href]) => <a key={href} href={href} className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary">{label}</a>)}</nav><div className="hidden items-center gap-3 lg:flex"><Button variant="ghost" asChild><a href="/login">Login</a></Button><Button asChild className="rounded-full px-5"><a href="/explore">Explore India <ArrowRight /></a></Button></div><Sheet><SheetTrigger asChild><Button size="icon" variant="outline" className="rounded-full lg:hidden" aria-label="Open navigation"><Menu /></Button></SheetTrigger><SheetContent className="w-[86%]"><SheetHeader><SheetTitle><Logo /></SheetTitle><SheetDescription>Discover stays and local travel across India.</SheetDescription></SheetHeader><nav className="mt-10 flex flex-col gap-2">{nav.map(([label, href]) => <SheetClose asChild key={href}><a href={href} className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">{label}</a></SheetClose>)}<SheetClose asChild><a href="/login" className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">Login</a></SheetClose><SheetClose asChild><Button asChild className="mt-5 h-12 rounded-full"><a href="/explore">Explore India <ArrowRight /></a></Button></SheetClose></nav></SheetContent></Sheet></div></header>;
+  const [currentUser, setCurrentUser] = useState<TrekoUser | null>(getCurrentUser);
+
+  useEffect(() => {
+    const syncUser = () => setCurrentUser(getCurrentUser());
+    syncUser();
+    window.addEventListener("treko-auth-change", syncUser);
+    return () => window.removeEventListener("treko-auth-change", syncUser);
+  }, []);
+
+  const handleLogout = () => {
+    logoutDemo();
+    window.location.href = "/";
+  };
+
+  return (
+    <header className="absolute inset-x-0 top-0 z-40">
+      <div className="mx-auto grid h-20 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center px-5 lg:grid-cols-[auto_1fr_auto] lg:px-8">
+        <Logo />
+        <nav className="hidden items-center justify-center gap-7 lg:flex">
+          {nav.map(([label, href]) => (
+            <a key={href} href={href} className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary">
+              {label}
+            </a>
+          ))}
+        </nav>
+        <div className="hidden items-center gap-3 lg:flex">
+          {currentUser ? (
+            <>
+              <div className="rounded-full bg-secondary px-3 py-2 text-sm font-semibold text-foreground">
+                Hi, {currentUser.firstName}
+              </div>
+              <Button variant="ghost" asChild>
+                <a href="/my-plans">My Plans</a>
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>Logout</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <a href="/login">Login</a>
+              </Button>
+              <Button asChild className="rounded-full px-5">
+                <a href="/explore">
+                  Explore India <ArrowRight />
+                </a>
+              </Button>
+            </>
+          )}
+        </div>
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button size="icon" variant="outline" className="rounded-full lg:hidden" aria-label="Open navigation">
+              <Menu />
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-[86%]">
+            <SheetHeader>
+              <SheetTitle>
+                <Logo />
+              </SheetTitle>
+              <SheetDescription>Discover stays and local travel across India.</SheetDescription>
+            </SheetHeader>
+            <nav className="mt-10 flex flex-col gap-2">
+              {nav.map(([label, href]) => (
+                <SheetClose asChild key={href}>
+                  <a href={href} className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">
+                    {label}
+                  </a>
+                </SheetClose>
+              ))}
+              {currentUser ? (
+                <>
+                  <Button variant="outline" asChild className="mt-4">
+                    <a href="/my-plans">My Plans</a>
+                  </Button>
+                  <Button onClick={handleLogout} className="mt-2">Logout</Button>
+                </>
+              ) : (
+                <SheetClose asChild>
+                  <a href="/login" className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">
+                    Login
+                  </a>
+                </SheetClose>
+              )}
+            </nav>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </header>
+  );
 }
 
 function Hero() {
-  return <section id="top" className="relative overflow-hidden bg-hero"><Navbar /><div className="mx-auto grid min-h-[680px] max-w-7xl items-center gap-12 px-5 pb-20 pt-28 md:grid-cols-[1.02fr_.98fr] md:px-8 md:pb-24 md:pt-32"><div className="relative z-10 max-w-2xl"><div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-2 text-xs font-semibold text-foreground shadow-sm backdrop-blur"><span className="grid size-5 place-items-center rounded-full bg-accent text-accent-foreground"><MapPin className="size-3" /></span>Discover India, destination by destination</div><h1 className="font-display text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[.96] text-foreground">Explore India.<br /><span className="text-primary">Stay Better.</span><br />Travel Local.</h1><p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">Discover trusted stays and local cab operators for your destination — all in one place.</p><div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-foreground/75"><span className="flex items-center gap-2"><BedDouble className="size-4 text-primary" />Stays for every journey</span><span className="flex items-center gap-2"><CarFront className="size-4 text-primary" />Local operators</span></div><Button asChild className="mt-9 h-12 rounded-full px-7 text-base"><a href="/login">Get Started <ArrowRight /></a></Button></div><div className="relative mx-auto w-full max-w-[510px] md:translate-y-5"><div className="image-frame aspect-[4/5] overflow-hidden rounded-[2rem] shadow-hero"><img src={heroImage} width={1200} height={1504} alt="Ujjain temples and Shipra river at sunrise" className="h-full w-full object-cover" /></div><div className="absolute left-4 top-5 rounded-xl bg-card/90 px-4 py-3 shadow-lg backdrop-blur md:-left-8 md:top-10"><p className="text-[10px] font-semibold uppercase text-muted-foreground">Featured destination</p><p className="mt-0.5 font-display text-sm font-bold text-foreground">Ujjain, Madhya Pradesh</p></div><div className="absolute -bottom-6 right-4 rounded-xl bg-card px-4 py-3 shadow-lg md:-right-5"><div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-full bg-accent text-primary"><BedDouble className="size-4" /></span><div><p className="text-xs font-bold">Stay + Cab</p><p className="text-[11px] text-muted-foreground">One destination, together</p></div></div></div></div></div></section>;
+  const [currentUser, setCurrentUser] = useState<TrekoUser | null>(getCurrentUser);
+
+  useEffect(() => {
+    const syncUser = () => setCurrentUser(getCurrentUser());
+    syncUser();
+    window.addEventListener("treko-auth-change", syncUser);
+    return () => window.removeEventListener("treko-auth-change", syncUser);
+  }, []);
+
+  return (
+    <section id="top" className="relative overflow-hidden bg-hero">
+      <Navbar />
+      <div className="mx-auto grid min-h-[680px] max-w-7xl items-center gap-12 px-5 pb-20 pt-28 md:grid-cols-[1.02fr_.98fr] md:px-8 md:pb-24 md:pt-32">
+        <div className="relative z-10 max-w-2xl">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-2 text-xs font-semibold text-foreground shadow-sm backdrop-blur">
+            <span className="grid size-5 place-items-center rounded-full bg-accent text-accent-foreground">
+              <MapPin className="size-3" />
+            </span>
+            Discover India, destination by destination
+          </div>
+
+          <h1 className="font-display text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[.96] text-foreground">
+            {currentUser ? (
+              <>
+                Hi, <span className="text-primary">{currentUser.firstName}</span>
+              </>
+            ) : (
+              <>
+                Explore India.
+                <br />
+                <span className="text-primary">Stay Better.</span>
+                <br />
+                Travel Local.
+              </>
+            )}
+          </h1>
+
+          <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+            Discover trusted stays and local cab operators for your destination ? all in one place.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-foreground/75">
+            <span className="flex items-center gap-2">
+              <BedDouble className="size-4 text-primary" />
+              Stays for every journey
+            </span>
+            <span className="flex items-center gap-2">
+              <CarFront className="size-4 text-primary" />
+              Local operators
+            </span>
+          </div>
+
+          <Button asChild className="mt-9 h-12 rounded-full px-7 text-base">
+            <a href={currentUser ? "/my-plans" : "/login"}>
+              {currentUser ? "My Plans" : "Get Started"} <ArrowRight />
+            </a>
+          </Button>
+
+        </div>
+
+        <div className="relative mx-auto w-full max-w-[510px] md:translate-y-5">
+          <div className="image-frame aspect-[4/5] overflow-hidden rounded-[2rem] shadow-hero">
+            <img
+              src={heroImage}
+              width={1200}
+              height={1504}
+              alt="Ujjain temples and Shipra river at sunrise"
+              className="h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute left-4 top-5 rounded-xl bg-card/90 px-4 py-3 shadow-lg backdrop-blur md:-left-8 md:top-10">
+            <p className="text-[10px] font-semibold uppercase text-muted-foreground">Featured destination</p>
+            <p className="mt-0.5 font-display text-sm font-bold text-foreground">Ujjain, Madhya Pradesh</p>
+          </div>
+
+          <div className="absolute -bottom-6 right-4 rounded-xl bg-card px-4 py-3 shadow-lg md:-right-5">
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 place-items-center rounded-full bg-accent text-primary">
+                <BedDouble className="size-4" />
+              </span>
+              <div>
+                <p className="text-xs font-bold">Stay + Cab</p>
+                <p className="text-[11px] text-muted-foreground">One destination, together</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
-  return <div className="mx-auto mb-10 max-w-2xl text-center"><p className="section-label">{eyebrow}</p><h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">{title}</h2><p className="mt-4 leading-7 text-muted-foreground">{copy}</p></div>;
+  return (
+    <div className="mx-auto mb-10 max-w-2xl text-center">
+      <p className="section-label">{eyebrow}</p>
+      <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">
+        {title}
+      </h2>
+      <p className="mt-4 leading-7 text-muted-foreground">{copy}</p>
+    </div>
+  );
 }
 
 function Destinations() {
-  return <section id="destinations" className="section-pad pt-36"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionHeading eyebrow="Explore" title="Explore India" copy="Discover popular destinations and find everything you need for your stay and local travel." /><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{destinations.map((item) => <article key={item.name} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"><div className="aspect-[4/3] overflow-hidden"><img src={item.image} width={1200} height={912} loading="lazy" alt={`${item.name}, ${item.state}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /></div><div className="p-5"><p className="text-xs font-bold uppercase text-primary">{item.state}</p><h3 className="mt-1 font-display text-2xl font-semibold">{item.name}</h3><p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{item.description}</p><div className="mt-4 flex flex-wrap gap-2"><span className="tag"><BedDouble />{item.stays}</span><span className="tag"><CarFront />{item.cabs}</span></div><Button variant="ghost" asChild className="mt-4 w-full justify-between px-0 hover:bg-transparent hover:text-primary"><a href="/stays">Explore {item.name}<ArrowRight /></a></Button></div></article>)}</div></div></section>;
+  return (
+    <section id="destinations" className="section-pad pt-36">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionHeading
+          eyebrow="Explore"
+          title="Explore India"
+          copy="Discover popular destinations and find everything you need for your stay and local travel."
+        />
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {destinations.map((item) => (
+            <article
+              key={item.name}
+              className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+            >
+              <div className="aspect-[4/3] overflow-hidden">
+                <img
+                  src={item.image}
+                  width={1200}
+                  height={912}
+                  loading="lazy"
+                  alt={`${item.name}, ${item.state}`}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+
+              <div className="p-5">
+                <p className="text-xs font-bold uppercase text-primary">{item.state}</p>
+                <h3 className="mt-1 font-display text-2xl font-semibold">{item.name}</h3>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="tag">
+                    <BedDouble />
+                    {item.stays}
+                  </span>
+                  <span className="tag">
+                    <CarFront />
+                    {item.cabs}
+                  </span>
+                </div>
+                <Button variant="ghost" asChild className="mt-4 w-full justify-between px-0 hover:bg-transparent hover:text-primary">
+                  <a href="/stays">
+                    Explore {item.name}
+                    <ArrowRight />
+                  </a>
+                </Button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 const steps = [
@@ -36,33 +290,136 @@ const steps = [
 ];
 
 function HowItWorks() {
-  return <section id="how-it-works" className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionHeading eyebrow="Simple by design" title="Everything You Need for Your Destination" copy="Start with a place. Treko brings the two essentials of your journey together." /><div className="relative grid gap-4 md:grid-cols-4"><div className="absolute left-[12%] right-[12%] top-7 hidden border-t border-dashed border-primary/40 md:block" />{steps.map(([Icon, title, copy], index) => { const StepIcon = Icon as typeof MapPin; return <div key={title as string} className="relative rounded-2xl bg-secondary p-6"><div className="grid size-14 place-items-center rounded-full border-4 border-background bg-primary text-primary-foreground"><StepIcon className="size-5" /></div><p className="mt-6 text-xs font-bold uppercase text-primary">Step {index + 1}</p><h3 className="mt-2 font-display text-xl font-semibold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{copy as string}</p></div>})}</div><div className="mt-10 grid items-center overflow-hidden rounded-2xl bg-foreground text-background lg:grid-cols-[.8fr_1.2fr]"><div className="p-8 md:p-10"><p className="section-label section-label-dark">Destination-first planning</p><h3 className="mt-3 font-display text-3xl font-semibold">One place. Two essentials.</h3><p className="mt-3 text-sm leading-6 text-background/70">Every destination on Treko follows the same clear path.</p></div><div className="grid gap-3 p-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-center"><div className="flow-node"><MapPin />Ujjain</div><ChevronRight className="mx-auto rotate-90 text-primary sm:rotate-0" /><div className="flow-node"><BedDouble />Accommodation</div><ChevronRight className="mx-auto rotate-90 text-primary sm:rotate-0" /><div className="flow-node"><CarFront />Cab Operators</div></div></div></div></section>;
-}
+  return (
+    <section id="how-it-works" className="section-pad">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionHeading
+          eyebrow="Simple by design"
+          title="Everything You Need for Your Destination"
+          copy="Start with a place. Treko brings the two essentials of your journey together."
+        />
 
-function Stays() {
-  return <section id="stays" className="section-pad bg-secondary"><div className="mx-auto max-w-7xl px-5 md:px-8"><div className="mb-10 grid gap-5 md:grid-cols-[1fr_auto] md:items-end"><div><p className="section-label">Accommodation</p><h2 className="mt-3 font-display text-4xl font-semibold md:text-5xl">Find Your Stay</h2><p className="mt-3 max-w-2xl text-muted-foreground">Browse mock accommodation options for your destination, from comfortable hotels to local homestays.</p></div><Button variant="outline" asChild className="w-fit rounded-full"><a href="/stays">View all stays <ArrowRight /></a></Button></div><div className="grid gap-5 md:grid-cols-3">{stays.map(item => <article key={item.name} className="group overflow-hidden rounded-2xl bg-card shadow-card"><div className="relative aspect-[4/3] overflow-hidden"><img src={item.image} width={1200} height={912} loading="lazy" alt={`${item.name} accommodation`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /><span className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1.5 text-xs font-bold backdrop-blur">{item.type}</span></div><div className="p-5"><div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3"><div className="min-w-0"><h3 className="truncate font-display text-xl font-semibold">{item.name}</h3><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3" />{item.location}</p></div><span className="flex h-fit items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary" />{item.rating}</span></div><div className="my-4 flex flex-wrap gap-2">{item.amenities.map(a => <span key={a} className="tag"><Check />{a}</span>)}</div><div className="flex items-end justify-between border-t border-border pt-4"><p><span className="font-display text-xl font-bold">{item.price}</span><span className="text-xs text-muted-foreground"> / night</span></p><Button variant="outline" size="sm">View Details</Button></div></div></article>)}</div><p className="mt-5 text-center text-xs text-muted-foreground">Prototype listings and prices shown for demonstration only.</p></div></section>;
+        <div className="relative grid gap-4 md:grid-cols-4">
+          <div className="absolute left-[12%] right-[12%] top-7 hidden border-t border-dashed border-primary/40 md:block" />
+          {steps.map(([Icon, title, copy], index) => {
+            const StepIcon = Icon as any;
+            return (
+              <div key={String(title)} className="relative rounded-2xl bg-secondary p-6">
+                <div className="grid size-14 place-items-center rounded-full border-4 border-background bg-primary text-primary-foreground">
+                  <StepIcon className="size-5" />
+                </div>
+                <p className="mt-6 text-xs font-bold uppercase text-primary">Step {index + 1}</p>
+                <h3 className="mt-2 font-display text-2xl font-semibold text-foreground">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }
-
-function CabOperators() {
-  return <section id="cabs" className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><div className="mb-10 max-w-3xl"><p className="section-label">Local travel</p><h2 className="mt-3 font-display text-4xl font-semibold md:text-5xl">Travel Around Your Destination</h2><p className="mt-4 text-muted-foreground">Find local cab operators who know the destination and the routes around it.</p></div><div className="grid gap-5 lg:grid-cols-3">{operators.map(item => <article key={item.name} className="rounded-2xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"><div className="flex items-start justify-between gap-4"><span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent font-display font-bold text-primary">{item.initials}</span><span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold"><Star className="size-3 fill-primary text-primary" />{item.rating}</span></div><h3 className="mt-5 font-display text-xl font-semibold">{item.name}</h3><div className="mt-5 space-y-4 text-sm"><Info icon={MapPin} label="Serving" value={item.serving} /><Info icon={CarFront} label="Vehicles" value={item.vehicles} /><Info icon={Route} label="Services" value={item.services} /></div><div className="mt-6 flex items-center justify-between border-t border-border pt-5"><p className="text-sm font-bold text-primary">{item.price}</p><Button size="sm">View Operator <ArrowRight /></Button></div></article>)}</div><p className="mt-5 text-center text-xs text-muted-foreground">Prototype operator details are illustrative and not verified listings.</p></div></section>;
-}
-
-function Info({ icon: Icon, label, value }: { icon: typeof MapPin; label: string; value: string }) {
-  return <div className="grid grid-cols-[auto_1fr] gap-3"><span className="grid size-8 place-items-center rounded-lg bg-secondary text-primary"><Icon className="size-4" /></span><div><p className="text-xs font-bold text-foreground">{label}</p><p className="mt-0.5 leading-5 text-muted-foreground">{value}</p></div></div>;
-}
-
-const benefits = [[Building2, "One Destination, Everything Together", "Find your stay and local travel options in one place."], [CarFront, "Local Travel Options", "Discover cab operators serving the destination and nearby routes."], [ShieldCheck, "Compare Before You Choose", "View different accommodation and operator options."], [Sparkles, "Explore India Locally", "Discover destinations through local stays and travel providers."]];
 
 function WhyTreko() {
-  return <section id="about" className="section-pad bg-secondary"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionHeading eyebrow="Built for local journeys" title="Why Use Treko?" copy="A focused way to plan the two things every destination needs." /><div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">{benefits.map(([Icon, title, copy]) => { const BenefitIcon = Icon as typeof MapPin; return <div key={title as string} className="bg-card p-7"><span className="grid size-11 place-items-center rounded-xl bg-accent text-primary"><BenefitIcon className="size-5" /></span><h3 className="mt-5 font-display text-lg font-semibold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{copy as string}</p></div>})}</div></div></section>;
+  return (
+    <section id="why-treko" className="section-pad bg-secondary">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionHeading
+          eyebrow="Why choose Treko"
+          title="Built for smarter travel planning"
+          copy="Explore a destination, compare stays and discover trusted local operators in one purposeful trip flow."
+        />
+
+        <div className="grid gap-5 md:grid-cols-3">
+          {[
+            [ShieldCheck, "Verified local focus", "Discover routes and stays with a destination-first mindset."],
+            [Building2, "Easy trip planning", "Bring the stay, transport and guide together without the noise."],
+            [Headphones, "Travel support", "Plan a trip with local guidance and the essentials you need for a smoother stay."],
+          ].map(([Icon, title, copy]) => {
+            const FeatureIcon = Icon as any;
+            return (
+              <div key={String(title)} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+                <span className="grid size-12 place-items-center rounded-xl bg-accent text-primary">
+                  <FeatureIcon className="size-5" />
+                </span>
+                <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">{title}</h3>
+                <p className="mt-3 leading-7 text-muted-foreground">{copy}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function Footer() {
-  return <footer className="bg-foreground text-background"><div id="final-cta" className="mx-auto max-w-7xl px-5 py-20 text-center md:px-8 md:py-24"><p className="section-label section-label-dark">Your next Indian journey</p><h2 className="mx-auto mt-4 max-w-3xl font-display text-4xl font-semibold md:text-6xl">Planning Your Next Trip in India?</h2><p className="mx-auto mt-5 max-w-xl text-background/65">Find your stay and local cab options for your destination with Treko.</p><Button className="mt-8 h-12 rounded-full px-7" onClick={() => { window.location.href = "/explore"; }}>Explore Destinations <ArrowRight /></Button></div><div className="border-t border-background/10"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:px-8"><div><div className="inline-flex rounded-md bg-background p-1"><Logo /></div><p className="mt-5 max-w-xs text-sm leading-6 text-background/55">India-focused discovery for stays and trusted local cab operators.</p></div><FooterLinks title="Explore" links={["Destinations", "Stays", "Cab Operators"]} /><FooterLinks title="Company" links={["About Treko", "Become a Partner", "Contact"]} /><FooterLinks title="Support" links={["Help", "FAQs", "Terms", "Privacy"]} /></div><div className="mx-auto flex max-w-7xl flex-col gap-2 border-t border-background/10 px-5 py-6 text-xs text-background/45 sm:flex-row sm:justify-between md:px-8"><p>© 2026 Treko. College project prototype.</p><p>Made for journeys across India.</p></div></div></footer>;
+function Highlights() {
+  return (
+    <section className="section-pad">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionHeading
+          eyebrow="What you can do"
+          title="Plan with confidence"
+          copy="Treko brings the essentials of a destination into one simple, accessible journey."
+        />
+
+        <div className="grid gap-5 md:grid-cols-4">
+          {[
+            ["4.8/5 average rating", "Travelers appreciate the clarity and ease of planning at a destination level."],
+            ["100+ curated places", "Browse destination-focused stays, stays and local operators across India."],
+            ["Trusted local context", "Experience the destination with local knowledge and practical planning support."],
+            ["Fast trip discovery", "Compare options quickly to find the right fit for your timetable and budget."],
+          ].map(([title, copy]) => (
+            <div key={String(title)} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <div className="mb-4 grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
+                <Star className="size-5 fill-primary text-primary" />
+              </div>
+              <h3 className="font-display text-xl font-semibold text-foreground">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function FooterLinks({ title, links }: { title: string; links: string[] }) { return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-3">{links.map(link => <li key={link}><a href="#top" className="text-sm text-background/55 transition-colors hover:text-background">{link}</a></li>)}</ul></div>; }
+function CTA() {
+  return (
+    <section className="section-pad pb-20">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <div className="rounded-[2rem] bg-foreground px-6 py-10 text-background shadow-card md:px-10 md:py-12">
+          <div className="md:flex md:items-end md:justify-between md:gap-8">
+            <div className="max-w-2xl">
+              <p className="section-label section-label-dark">Ready to plan?</p>
+              <h2 className="mt-3 font-display text-4xl font-semibold leading-tight md:text-5xl">
+                Find your next journey in India.
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-background/75">
+                Browse a destination, compare stays and discover local operators in one place.
+              </p>
+            </div>
+            <Button asChild className="mt-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 md:mt-0">
+              <a href="/explore">
+                Explore the country <ArrowRight />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function TrekoLanding() {
-  return <main className="overflow-hidden"><Hero /><Destinations /><HowItWorks /><Stays /><CabOperators /><WhyTreko /><Footer /></main>;
+  return (
+    <>
+      <Hero />
+      <Destinations />
+      <HowItWorks />
+      <WhyTreko />
+      <Highlights />
+      <CTA />
+    </>
+  );
 }

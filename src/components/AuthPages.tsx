@@ -1,13 +1,14 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, EyeOff, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/TrekoLanding";
-import { registerDemo, signInDemo } from "@/lib/auth";
+import { getCurrentUser, readTripSelection, registerDemo, signInDemo } from "@/lib/auth";
 
 type FormErrors = {
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
@@ -43,7 +44,7 @@ function AuthShell({ children, eyebrow, title, description }: {
           <h1 className="mt-2 font-display text-3xl font-semibold text-foreground sm:text-4xl lg:mt-0">{title}</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
           <div className="mt-5 rounded-xl border border-border bg-secondary/70 px-4 py-3 text-xs leading-5 text-muted-foreground">
-            Demo mode: this frontend preview doesn’t create or authenticate accounts. Form data isn’t saved or sent.
+            Secure Treko account access with your email and password. Your plan is loaded from the authenticated user profile.
           </div>
           <div className="mt-7">{children}</div>
         </section>
@@ -86,12 +87,21 @@ function validateEmail(email: string): string | undefined {
   return undefined;
 }
 
+function getPostAuthRoute(): "/checkout" | "/explore" {
+  return readTripSelection().length ? "/checkout" : "/explore";
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    if (getCurrentUser()) {
+      navigate({ to: getPostAuthRoute() });
+    }
+  }, [navigate]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -104,9 +114,10 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await signInDemo({ email: email.trim(), password });
-      await navigate({ to: "/explore" });
-    } catch {
-      setErrors({ form: "We couldn’t continue. Please try again." });
+      await navigate({ to: getPostAuthRoute() });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Invalid email or password.";
+      setErrors({ form: message });
     } finally {
       setSubmitting(false);
     }
@@ -131,17 +142,24 @@ export function LoginPage() {
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    if (getCurrentUser()) {
+      navigate({ to: getPostAuthRoute() });
+    }
+  }, [navigate]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextErrors: FormErrors = {};
-    if (!fullName.trim()) nextErrors.fullName = "Enter your full name.";
+    if (!firstName.trim()) nextErrors.firstName = "Enter your first name.";
+    if (!lastName.trim()) nextErrors.lastName = "Enter your last name.";
     const emailError = validateEmail(email);
     if (emailError) nextErrors.email = emailError;
     if (password.length < 8) nextErrors.password = "Use at least 8 characters for your password.";
@@ -152,10 +170,11 @@ export function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await registerDemo({ fullName: fullName.trim(), email: email.trim(), password });
-      await navigate({ to: "/explore" });
-    } catch {
-      setErrors({ form: "We couldn’t create the account. Please try again." });
+      await registerDemo({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim(), password });
+      await navigate({ to: getPostAuthRoute() });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "We couldn’t create the account. Please try again.";
+      setErrors({ form: message });
     } finally {
       setSubmitting(false);
     }
@@ -164,10 +183,17 @@ export function RegisterPage() {
   return (
     <AuthShell eyebrow="Start your next journey" title="Create Your Account" description="Create your Treko profile and find your next destination in India.">
       <form noValidate onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="register-name" className="text-sm font-semibold text-foreground">Full Name</label>
-          <Input id="register-name" name="name" autoComplete="name" value={fullName} onChange={(event) => { setFullName(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.fullName)} aria-describedby={errors.fullName ? "register-name-error" : undefined} className="mt-2 h-11" />
-          <FieldError id="register-name-error" message={errors.fullName} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="register-first-name" className="text-sm font-semibold text-foreground">First Name</label>
+            <Input id="register-first-name" name="firstName" autoComplete="given-name" value={firstName} onChange={(event) => { setFirstName(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.firstName)} aria-describedby={errors.firstName ? "register-first-name-error" : undefined} className="mt-2 h-11" />
+            <FieldError id="register-first-name-error" message={errors.firstName} />
+          </div>
+          <div>
+            <label htmlFor="register-last-name" className="text-sm font-semibold text-foreground">Last Name</label>
+            <Input id="register-last-name" name="lastName" autoComplete="family-name" value={lastName} onChange={(event) => { setLastName(event.target.value); setErrors({}); }} aria-invalid={Boolean(errors.lastName)} aria-describedby={errors.lastName ? "register-last-name-error" : undefined} className="mt-2 h-11" />
+            <FieldError id="register-last-name-error" message={errors.lastName} />
+          </div>
         </div>
         <div>
           <label htmlFor="register-email" className="text-sm font-semibold text-foreground">Email</label>

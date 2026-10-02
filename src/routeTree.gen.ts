@@ -11,11 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MyPlansRouteImport } from './routes/my-plans'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as StaysRouteImport } from './routes/stays'
+import { Route as DestinationListingSlugRouteImport } from './routes/$destination/$listingSlug'
 import { Route as DestinationIdRouteImport } from './routes/destination/$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +31,11 @@ const CabOperatorsRoute = CabOperatorsRouteImport.update({
   path: '/cab-operators',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
@@ -36,6 +44,11 @@ const ExploreRoute = ExploreRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyPlansRoute = MyPlansRouteImport.update({
+  id: '/my-plans',
+  path: '/my-plans',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerRoute = PartnerRouteImport.update({
@@ -53,6 +66,11 @@ const StaysRoute = StaysRouteImport.update({
   path: '/stays',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DestinationListingSlugRoute = DestinationListingSlugRouteImport.update({
+  id: '/$destination/$listingSlug',
+  path: '/$destination/$listingSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinationIdRoute = DestinationIdRouteImport.update({
   id: '/destination/$id',
   path: '/destination/$id',
@@ -62,32 +80,41 @@ const DestinationIdRoute = DestinationIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
   '/login': typeof LoginRoute
+  '/my-plans': typeof MyPlansRoute
   '/partner': typeof PartnerRoute
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
+  '/$destination/$listingSlug': typeof DestinationListingSlugRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
   '/login': typeof LoginRoute
+  '/my-plans': typeof MyPlansRoute
   '/partner': typeof PartnerRoute
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
+  '/$destination/$listingSlug': typeof DestinationListingSlugRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cab-operators': typeof CabOperatorsRoute
+  '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
   '/login': typeof LoginRoute
+  '/my-plans': typeof MyPlansRoute
   '/partner': typeof PartnerRoute
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
+  '/$destination/$listingSlug': typeof DestinationListingSlugRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRouteTypes {
@@ -95,42 +122,54 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cab-operators'
+    | '/checkout'
     | '/explore'
     | '/login'
+    | '/my-plans'
     | '/partner'
     | '/register'
     | '/stays'
+    | '/$destination/$listingSlug'
     | '/destination/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cab-operators'
+    | '/checkout'
     | '/explore'
     | '/login'
+    | '/my-plans'
     | '/partner'
     | '/register'
     | '/stays'
+    | '/$destination/$listingSlug'
     | '/destination/$id'
   id:
     | '__root__'
     | '/'
     | '/cab-operators'
+    | '/checkout'
     | '/explore'
     | '/login'
+    | '/my-plans'
     | '/partner'
     | '/register'
     | '/stays'
+    | '/$destination/$listingSlug'
     | '/destination/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CabOperatorsRoute: typeof CabOperatorsRoute
+  CheckoutRoute: typeof CheckoutRoute
   ExploreRoute: typeof ExploreRoute
   LoginRoute: typeof LoginRoute
+  MyPlansRoute: typeof MyPlansRoute
   PartnerRoute: typeof PartnerRoute
   RegisterRoute: typeof RegisterRoute
   StaysRoute: typeof StaysRoute
+  DestinationListingSlugRoute: typeof DestinationListingSlugRoute
   DestinationIdRoute: typeof DestinationIdRoute
 }
 
@@ -150,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CabOperatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
@@ -162,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-plans': {
+      id: '/my-plans'
+      path: '/my-plans'
+      fullPath: '/my-plans'
+      preLoaderRoute: typeof MyPlansRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner': {
@@ -185,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StaysRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$destination/$listingSlug': {
+      id: '/$destination/$listingSlug'
+      path: '/$destination/$listingSlug'
+      fullPath: '/$destination/$listingSlug'
+      preLoaderRoute: typeof DestinationListingSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destination/$id': {
       id: '/destination/$id'
       path: '/destination/$id'
@@ -198,11 +258,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CabOperatorsRoute: CabOperatorsRoute,
+  CheckoutRoute: CheckoutRoute,
   ExploreRoute: ExploreRoute,
   LoginRoute: LoginRoute,
+  MyPlansRoute: MyPlansRoute,
   PartnerRoute: PartnerRoute,
   RegisterRoute: RegisterRoute,
   StaysRoute: StaysRoute,
+  DestinationListingSlugRoute: DestinationListingSlugRoute,
   DestinationIdRoute: DestinationIdRoute,
 }
 export const routeTree = rootRouteImport
