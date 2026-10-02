@@ -14,11 +14,8 @@ Treko is a travel planning platform focused on simplifying travel within India b
 
 🚀 Live Demo
 
-<<<<<<< HEAD
 👉 [View Treko Live Demo](https://discover-treko-india.vercel.app/)
-=======
-👉 "View Treko Live Demo" (https://discover-treko-india.vercel.app/)
->>>>>>> 23bcf0e7243205affc43c9af72f67283fe1ed4d0
+
 
 🛠️ Tech Stack
 
