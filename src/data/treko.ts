@@ -22,7 +22,18 @@ export const indianPlaces = [
   "Ayodhya, Uttar Pradesh",
 ];
 
-export const destinations = [
+export type Destination = {
+  id: string;
+  name: string;
+  state: string;
+  description: string;
+  stays: string;
+  cabs: string;
+  image: string;
+  images?: string[];
+};
+
+export const destinations: Destination[] = [
   { id: "delhi", name: "Delhi", state: "Delhi", description: "Historic monuments, bustling markets and India’s capital story.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "mumbai", name: "Mumbai", state: "Maharashtra", description: "A vibrant coastal city of culture, food and cinema.", stays: "Explore stays", cabs: "Local cabs", image: goaImage },
   { id: "goa", name: "Goa", state: "Goa", description: "Coastal villages, heritage quarters and relaxed beaches.", stays: "150+ stays", cabs: "41 cab operators", image: goaImage },
@@ -30,7 +41,7 @@ export const destinations = [
   { id: "udaipur", name: "Udaipur", state: "Rajasthan", description: "Lakeside palaces, old city lanes and Aravalli views.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "agra", name: "Agra", state: "Uttar Pradesh", description: "Mughal landmarks and the marble wonder of the Taj Mahal.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "varanasi", name: "Varanasi", state: "Uttar Pradesh", description: "Ancient ghats, riverside rituals and storied lanes.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainImage },
+  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainImage, images: [ujjainImage, ujjainStay] },
   { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage },
   { id: "manali", name: "Manali", state: "Himachal Pradesh", description: "Mountain roads, pine valleys and Himalayan escapes.", stays: "85+ stays", cabs: "24 cab operators", image: manaliImage },
   { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
