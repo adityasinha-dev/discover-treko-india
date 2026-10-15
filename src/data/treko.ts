@@ -49,11 +49,7 @@ export const destinations: Destination[] = [
   { id: "udaipur", name: "Udaipur", state: "Rajasthan", description: "Lakeside palaces, old city lanes and Aravalli views.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "agra", name: "Agra", state: "Uttar Pradesh", description: "Mughal landmarks and the marble wonder of the Taj Mahal.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "varanasi", name: "Varanasi", state: "Uttar Pradesh", description: "Ancient ghats, riverside rituals and storied lanes.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-<<<<<<< HEAD
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_01 },
-=======
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainImage, images: [ujjainImage, ujjainStay] },
->>>>>>> 3166ebca9d7f3b4fa40880d9032c4c3547047964
+  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_01, images: [ujjainCover_01, ujjainCover_02, ujjainCover_03, ujjainCover_04, ujjainCover_05] },
   { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage },
   { id: "manali", name: "Manali", state: "Himachal Pradesh", description: "Mountain roads, pine valleys and Himalayan escapes.", stays: "85+ stays", cabs: "24 cab operators", image: manaliImage },
   { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
