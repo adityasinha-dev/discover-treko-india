@@ -4,8 +4,16 @@ import manaliImage from "@/assets/destination-manali.jpg";
 import rishikeshImage from "@/assets/destination-rishikesh.jpg";
 import jaipurStay from "@/assets/stay-jaipur.jpg";
 import rishikeshStay from "@/assets/stay-rishikesh.jpg";
-import ujjainStay from "@/assets/stay-ujjain.jpg";
+//Ujjain Images
 import ujjainImage from "@/assets/hero-ujjain.jpg";
+import ujjainCover_01 from "@/assets/ujjain-cover-1.jpg";
+import ujjainCover_02 from "@/assets/ujjain-cover-2.jpg";
+import ujjainCover_03 from "@/assets/ujjain-cover-3.jpg";
+import ujjainCover_04 from "@/assets/ujjain-cover-4.jpg";
+import ujjainCover_05 from "@/assets/ujjain-cover-5.jpg";
+
+
+import ujjainStay from "@/assets/stay-ujjain.jpg";
 
 export const indianPlaces = [
   "Ujjain, Madhya Pradesh",
@@ -30,7 +38,7 @@ export const destinations = [
   { id: "udaipur", name: "Udaipur", state: "Rajasthan", description: "Lakeside palaces, old city lanes and Aravalli views.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "agra", name: "Agra", state: "Uttar Pradesh", description: "Mughal landmarks and the marble wonder of the Taj Mahal.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
   { id: "varanasi", name: "Varanasi", state: "Uttar Pradesh", description: "Ancient ghats, riverside rituals and storied lanes.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Temple heritage and a spiritual journey along the Shipra.", stays: "Explore stays", cabs: "Local cabs", image: ujjainImage },
+  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_01 },
   { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage },
   { id: "manali", name: "Manali", state: "Himachal Pradesh", description: "Mountain roads, pine valleys and Himalayan escapes.", stays: "85+ stays", cabs: "24 cab operators", image: manaliImage },
   { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
