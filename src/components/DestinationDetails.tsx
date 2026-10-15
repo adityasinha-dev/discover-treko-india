@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, BedDouble, CarFront, Check, Compass, Languages, MapPin, Star, UserRound } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,18 @@ export function DestinationDetailsPage() {
   const { id } = useParams({ from: "/destination/$id" });
   const navigate = useNavigate();
   const destination = getDestination(id);
+  const destinationImages = destination?.images ?? (destination ? [destination.image] : []);
+  const [activeDestinationImage, setActiveDestinationImage] = useState(0);
+
+  useEffect(() => {
+    if (destinationImages.length < 2) return;
+
+    const intervalId = window.setInterval(() => {
+      setActiveDestinationImage((current) => (current + 1) % destinationImages.length);
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [destinationImages.length]);
   const [selection, setSelection] = useState<{ stay?: string; cab?: string; guide?: string }>(() => {
     const savedItems = readTripSelection().filter((item) => item.destination === destination?.name);
     return {
@@ -83,7 +95,6 @@ export function DestinationDetailsPage() {
   });
   if (!destination) return <main className="min-h-screen bg-background"><div className="relative h-20 bg-hero"><Navbar /></div><div className="mx-auto max-w-2xl px-5 py-24 text-center"><h1 className="font-display text-4xl font-semibold">Destination not found</h1><p className="mt-3 text-muted-foreground">This destination is not currently listed in Treko.</p><Button asChild className="mt-7 rounded-full"><a href="/explore"><ArrowLeft /> Back to Explore</a></Button></div></main>;
 
-  const destinationImages = destination.images ?? [destination.image];
   const destinationStays = getStaysForDestination(id);
   const destinationOperators = getOperatorsForDestination(id);
   const destinationGuides = getGuidesForDestination(id);
@@ -172,7 +183,52 @@ export function DestinationDetailsPage() {
   };
 
   return <main className={`min-h-screen bg-background ${selectedItems.length ? "pb-24" : ""}`}>
-    <div className="relative bg-hero"><Navbar /><div className="mx-auto max-w-7xl px-5 pb-14 pt-28 md:px-8 md:pb-20"><a href="/explore" className="inline-flex items-center gap-2 text-sm font-semibold text-primary"><ArrowLeft className="size-4" /> Back to Explore</a><div className="mt-8 grid items-end gap-8 md:grid-cols-[1fr_.8fr]"><div><p className="section-label">{destination.state}</p><h1 className="mt-3 font-display text-5xl font-semibold leading-tight md:text-7xl">Explore {destination.name}</h1><p className="mt-5 max-w-xl text-lg leading-8 text-muted-foreground">{destination.description}</p><div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold"><span className="tag"><BedDouble />{destination.stays}</span><span className="tag"><CarFront />{destination.cabs}</span></div></div><div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-hero"><div className="flex h-full snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth">{destinationImages.map((image, index) => <img key={`${destination.id}-${index}`} src={image} alt={`${destination.name}, photo ${index + 1}`} className="h-full w-full shrink-0 snap-center object-cover" />)}</div></div></div></div></div>
+    <div className="relative bg-hero"><Navbar /><div className="mx-auto max-w-7xl px-5 pb-14 pt-28 md:px-8 md:pb-20"><a href="/explore" className="inline-flex items-center gap-2 text-sm font-semibold text-primary"><ArrowLeft className="size-4" /> Back to Explore</a><div className="mt-8 grid items-end gap-8 md:grid-cols-[1fr_.8fr]"><div><p className="section-label">{destination.state}</p><h1 className="mt-3 font-display text-5xl font-semibold leading-tight md:text-7xl">Explore {destination.name}</h1><p className="mt-5 max-w-xl text-lg leading-8 text-muted-foreground">{destination.description}</p><div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold"><span className="tag"><BedDouble />{destination.stays}</span><span className="tag"><CarFront />{destination.cabs}</span></div></div><div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-hero">
+          <div className="relative h-full w-full" role="region" aria-roledescription="carousel" aria-label={`${destination.name} photos`}>
+            <div className="flex h-full transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${activeDestinationImage * 100}%)` }}>
+              {destinationImages.map((image, index) => (
+                <img
+                  key={`${destination.id}-${index}`}
+                  src={image}
+                  alt={`${destination.name}, photo ${index + 1}`}
+                  className="h-full w-full flex-none object-cover"
+                />
+              ))}
+            </div>
+            {destinationImages.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous destination photo"
+                  onClick={() => setActiveDestinationImage((current) => (current - 1 + destinationImages.length) % destinationImages.length)}
+                  className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-background/85 text-foreground shadow"
+                >
+                  <ArrowLeft className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next destination photo"
+                  onClick={() => setActiveDestinationImage((current) => (current + 1) % destinationImages.length)}
+                  className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-background/85 text-foreground shadow"
+                >
+                  <ArrowLeft className="size-5 rotate-180" />
+                </button>
+                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
+                  {destinationImages.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={`Go to photo ${index + 1}`}
+                      aria-current={activeDestinationImage === index}
+                      onClick={() => setActiveDestinationImage(index)}
+                      className={`h-2.5 rounded-full transition-all ${activeDestinationImage === index ? "w-7 bg-white" : "w-2.5 bg-white/60"}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div></div></div></div>
     <section className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionTitle icon={BedDouble} title="Stays" copy={`Choose a place to stay in ${destination.name}.`} />{destinationStays.length === 0 ? <EmptyState item="stays" /> : <div className="grid gap-5 md:grid-cols-3">{destinationStays.map((stay) => <StayCard key={stay.id} stay={stay} selected={selection.stay === stay.id} onSelect={() => toggle("stay", stay.id)} />)}</div>}</div></section>
     <section className="section-pad bg-secondary"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionTitle icon={CarFront} title="Cab Operators" copy={`Travel around ${destination.name} with operators serving this destination and its nearby routes.`} />{destinationOperators.length === 0 ? <EmptyState item="cab operators" /> : <div className="grid gap-5 md:grid-cols-3">{destinationOperators.map((operator) => <article key={operator.id} className="rounded-2xl border border-border bg-card p-6 shadow-card"><div className="flex items-start justify-between gap-4"><span className="grid size-12 place-items-center rounded-xl bg-accent font-display font-bold text-primary">{operator.initials}</span><span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold"><Star className="size-3 fill-primary text-primary" />{operator.rating}</span></div><h3 className="mt-5 font-display text-xl font-semibold">{operator.name}</h3><div className="mt-5 space-y-4 text-sm"><p><span className="font-semibold">Serving</span><br /><span className="text-muted-foreground">{operator.serving}</span></p><p><span className="font-semibold">Vehicles</span><br /><span className="text-muted-foreground">{operator.vehicles}</span></p><p><span className="font-semibold">Services</span><br /><span className="text-muted-foreground">{operator.services}</span></p></div><div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5"><p className="text-sm font-bold text-primary">{operator.price}</p><div className="flex items-center gap-2"><a href={createListingUrl(operator.destinationId, operator.slug)} className="inline-flex items-center rounded-full border border-border px-3 py-2 text-xs font-semibold text-primary">View Cab</a><Button type="button" size="sm" variant={selection.cab === operator.id ? "default" : "outline"} aria-pressed={selection.cab === operator.id} onClick={() => toggle("cab", operator.id)}>{selection.cab === operator.id ? "Selected" : "Select cab"}</Button></div></div></article>)}</div>}</div></section>
     <section className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><SectionTitle icon={UserRound} title="Local Guides" copy={`Meet local people who can help you experience ${destination.name} with more context.`} />{destinationGuides.length === 0 ? <EmptyState item="local guides" /> : <div className="grid gap-5 md:grid-cols-3">{destinationGuides.map((guide) => <article key={guide.id} className="rounded-2xl border border-border bg-card p-6 shadow-card"><div className="flex items-start justify-between gap-4"><span className="grid size-14 place-items-center rounded-full bg-accent font-display text-lg font-bold text-primary">{guide.initials}</span><span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold"><Star className="size-3 fill-primary text-primary" />{guide.rating}</span></div><h3 className="mt-5 font-display text-xl font-semibold">{guide.name}</h3><p className="mt-1 text-sm font-semibold text-primary">{guide.specialization}</p><p className="mt-3 text-sm leading-6 text-muted-foreground">{guide.description}</p><div className="mt-5 space-y-2 text-sm text-muted-foreground"><p className="flex items-center gap-2"><Compass className="size-4 text-primary" />{guide.experience} experience</p><p className="flex items-center gap-2"><Languages className="size-4 text-primary" />{guide.languages}</p></div><div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5"><p className="text-sm font-bold text-primary">{guide.price}</p><div className="flex items-center gap-2"><a href={createListingUrl(guide.destinationId, guide.slug)} className="inline-flex items-center rounded-full border border-border px-3 py-2 text-xs font-semibold text-primary">View Guide</a><Button type="button" size="sm" variant={selection.guide === guide.id ? "default" : "outline"} aria-pressed={selection.guide === guide.id} onClick={() => toggle("guide", guide.id)}>{selection.guide === guide.id ? "Selected" : "Select guide"}</Button></div></div></article>)}</div>}</div></section>
