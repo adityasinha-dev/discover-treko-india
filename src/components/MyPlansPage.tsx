@@ -3,7 +3,15 @@ import { CalendarDays, MapPin, Route } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/TrekoLanding";
-import { getCurrentUser, readBookings, readTripSelection, type BookingRecord, type TripItem } from "@/lib/auth";
+import { isSupportedDestination } from "@/data/treko";
+import {
+  getCurrentUser,
+  readBookings,
+  readTripSelection,
+  saveTripSelection,
+  type BookingRecord,
+  type TripItem,
+} from "@/lib/auth";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -75,10 +83,18 @@ export function MyPlansPage() {
     today.setHours(0, 0, 0, 0);
     setBookings(
       readBookings().filter(
-        (booking) => booking.userId === currentUser.id && isCurrentOrFuturePlan(booking, today),
+        (booking) =>
+          booking.userId === currentUser.id &&
+          isSupportedDestination(booking.destination) &&
+          booking.items.every((item) => isSupportedDestination(item.destination)) &&
+          isCurrentOrFuturePlan(booking, today),
       ),
     );
-    setDraftItems(readTripSelection());
+    const supportedDraftItems = readTripSelection().filter((item) =>
+      isSupportedDestination(item.destination),
+    );
+    saveTripSelection(supportedDraftItems);
+    setDraftItems(supportedDraftItems);
   }, [navigate]);
 
   if (!getCurrentUser()) {

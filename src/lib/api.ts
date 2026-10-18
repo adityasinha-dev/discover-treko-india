@@ -1,5 +1,15 @@
 const DEFAULT_API_URL = "http://localhost:5000";
 
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+  }
+}
+
 export function getApiBaseUrl(): string {
   const configuredUrl = import.meta.env.VITE_API_URL;
   if (typeof configuredUrl === "string" && configuredUrl.trim()) {
@@ -22,7 +32,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
   }
 
   const token = localStorage.getItem("treko-auth-token");
-  if (token) {
+  if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
@@ -35,7 +45,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
 
   if (!response.ok) {
     const message = data?.message || "Request failed.";
-    throw new Error(message);
+    throw new ApiRequestError(message, response.status);
   }
 
   return data as T;

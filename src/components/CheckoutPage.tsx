@@ -3,7 +3,9 @@ import { ArrowLeft, Clock3, Trash2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/api";
 import { Navbar } from "@/components/TrekoLanding";
+import { isSupportedDestination } from "@/data/treko";
 import {
   clearTripSelection,
   getCurrentUser,
@@ -11,6 +13,7 @@ import {
   isValidCoupon,
   readBookings,
   readTripSelection,
+  saveTripSelection,
   type BookingRecord,
   type TripItem,
   writeBookings,
@@ -36,6 +39,8 @@ export function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState("");
   const [couponError, setCouponError] = useState("");
   const [booking, setBooking] = useState<BookingRecord | null>(null);
+  const [bookingError, setBookingError] = useState("");
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -44,7 +49,11 @@ export function CheckoutPage() {
       return;
     }
 
-    setItems(readTripSelection());
+    const supportedItems = readTripSelection().filter((item) =>
+      isSupportedDestination(item.destination),
+    );
+    saveTripSelection(supportedItems);
+    setItems(supportedItems);
   }, [navigate]);
 
   const subtotal = useMemo(
@@ -83,36 +92,34 @@ export function CheckoutPage() {
     setCouponApplied("");
   };
 
-  const handleCompleteBooking = () => {
+  const handleCompleteBooking = async () => {
     const currentUser = getCurrentUser();
     if (!currentUser || !items.length) return;
+    if (items.some((item) => !isSupportedDestination(item.destination))) return;
 
-    const bookingId = `TRK-${Date.now().toString().slice(-6)}`;
     const destination = items[0]?.destination ?? "India";
-    const hotel = items.find((item) => item.type === "stay")?.name ?? null;
-    const cab = items.find((item) => item.type === "cab")?.name ?? null;
-    const guide = items.find((item) => item.type === "guide")?.name ?? null;
-
-    const record: BookingRecord = {
-      id: bookingId,
-      userId: currentUser.id,
-      userName: `${currentUser.firstName} ${currentUser.lastName}`.trim(),
-      destination,
-      hotel,
-      cab,
-      guide,
-      items,
-      total: finalTotal,
-      couponUsed: couponApplied || null,
-      bookingDate: new Date().toISOString(),
-      status: "Pending",
-    };
-
-    const existingBookings = readBookings();
-    writeBookings([record, ...existingBookings]);
-    clearTripSelection();
-    setBooking(record);
-    setItems([]);
+    setBookingError("");
+    setBookingSubmitting(true);
+    try {
+      const result = await apiRequest<{ booking: BookingRecord }>("/api/bookings", {
+        method: "POST",
+        body: JSON.stringify({
+          destination,
+          items,
+          total: finalTotal,
+          couponUsed: couponApplied || null,
+        }),
+      });
+      const existingBookings = readBookings();
+      writeBookings([result.booking, ...existingBookings]);
+      clearTripSelection();
+      setBooking(result.booking);
+      setItems([]);
+    } catch (error) {
+      setBookingError(error instanceof Error ? error.message : "Unable to complete this booking.");
+    } finally {
+      setBookingSubmitting(false);
+    }
   };
 
   if (!getCurrentUser()) {
@@ -225,8 +232,9 @@ export function CheckoutPage() {
                 <span className="font-display text-3xl font-semibold text-primary">{formatCurrency(finalTotal)}</span>
               </div>
             </div>
-            <Button onClick={handleCompleteBooking} disabled={!items.length} className="mt-8 h-12 w-full rounded-full text-base">
-              Complete booking
+            {bookingError ? <p role="alert" className="mt-4 text-sm text-destructive">{bookingError}</p> : null}
+            <Button onClick={handleCompleteBooking} disabled={!items.length || bookingSubmitting} className="mt-8 h-12 w-full rounded-full text-base">
+              {bookingSubmitting ? "Submitting booking…" : "Complete booking"}
             </Button>
           </aside>
         </div>

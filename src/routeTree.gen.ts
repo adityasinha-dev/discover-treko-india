@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BusinessDashboardRouteImport } from './routes/business-dashboard'
 import { Route as CabOperatorsRouteImport } from './routes/cab-operators'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ExploreRouteImport } from './routes/explore'
@@ -19,11 +20,19 @@ import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as StaysRouteImport } from './routes/stays'
 import { Route as DestinationListingSlugRouteImport } from './routes/$destination/$listingSlug'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminPartnerApplicationsRouteImport } from './routes/admin/partner-applications'
 import { Route as DestinationIdRouteImport } from './routes/destination/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessDashboardRoute = BusinessDashboardRouteImport.update({
+  id: '/business-dashboard',
+  path: '/business-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CabOperatorsRoute = CabOperatorsRouteImport.update({
@@ -71,6 +80,22 @@ const DestinationListingSlugRoute = DestinationListingSlugRouteImport.update({
   path: '/$destination/$listingSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPartnerApplicationsRoute =
+  AdminPartnerApplicationsRouteImport.update({
+    id: '/admin/partner-applications',
+    path: '/admin/partner-applications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DestinationIdRoute = DestinationIdRouteImport.update({
   id: '/destination/$id',
   path: '/destination/$id',
@@ -79,6 +104,7 @@ const DestinationIdRoute = DestinationIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/business-dashboard': typeof BusinessDashboardRoute
   '/cab-operators': typeof CabOperatorsRoute
   '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
@@ -88,10 +114,14 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
   '/$destination/$listingSlug': typeof DestinationListingSlugRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/business-dashboard': typeof BusinessDashboardRoute
   '/cab-operators': typeof CabOperatorsRoute
   '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
@@ -101,11 +131,15 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
   '/$destination/$listingSlug': typeof DestinationListingSlugRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/business-dashboard': typeof BusinessDashboardRoute
   '/cab-operators': typeof CabOperatorsRoute
   '/checkout': typeof CheckoutRoute
   '/explore': typeof ExploreRoute
@@ -115,12 +149,16 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/stays': typeof StaysRoute
   '/$destination/$listingSlug': typeof DestinationListingSlugRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/business-dashboard'
     | '/cab-operators'
     | '/checkout'
     | '/explore'
@@ -130,10 +168,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/stays'
     | '/$destination/$listingSlug'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/admin/partner-applications'
     | '/destination/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/business-dashboard'
     | '/cab-operators'
     | '/checkout'
     | '/explore'
@@ -143,10 +185,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/stays'
     | '/$destination/$listingSlug'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/admin/partner-applications'
     | '/destination/$id'
   id:
     | '__root__'
     | '/'
+    | '/business-dashboard'
     | '/cab-operators'
     | '/checkout'
     | '/explore'
@@ -156,11 +202,15 @@ export interface FileRouteTypes {
     | '/register'
     | '/stays'
     | '/$destination/$listingSlug'
+    | '/admin/dashboard'
+    | '/admin/login'
+    | '/admin/partner-applications'
     | '/destination/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BusinessDashboardRoute: typeof BusinessDashboardRoute
   CabOperatorsRoute: typeof CabOperatorsRoute
   CheckoutRoute: typeof CheckoutRoute
   ExploreRoute: typeof ExploreRoute
@@ -170,6 +220,9 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   StaysRoute: typeof StaysRoute
   DestinationListingSlugRoute: typeof DestinationListingSlugRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminPartnerApplicationsRoute: typeof AdminPartnerApplicationsRoute
   DestinationIdRoute: typeof DestinationIdRoute
 }
 
@@ -180,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business-dashboard': {
+      id: '/business-dashboard'
+      path: '/business-dashboard'
+      fullPath: '/business-dashboard'
+      preLoaderRoute: typeof BusinessDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cab-operators': {
@@ -245,6 +305,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DestinationListingSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/partner-applications': {
+      id: '/admin/partner-applications'
+      path: '/admin/partner-applications'
+      fullPath: '/admin/partner-applications'
+      preLoaderRoute: typeof AdminPartnerApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destination/$id': {
       id: '/destination/$id'
       path: '/destination/$id'
@@ -257,6 +338,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BusinessDashboardRoute: BusinessDashboardRoute,
   CabOperatorsRoute: CabOperatorsRoute,
   CheckoutRoute: CheckoutRoute,
   ExploreRoute: ExploreRoute,
@@ -266,6 +348,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   StaysRoute: StaysRoute,
   DestinationListingSlugRoute: DestinationListingSlugRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminPartnerApplicationsRoute: AdminPartnerApplicationsRoute,
   DestinationIdRoute: DestinationIdRoute,
 }
 export const routeTree = rootRouteImport

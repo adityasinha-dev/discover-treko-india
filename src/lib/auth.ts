@@ -146,6 +146,27 @@ export function getAuthToken(): string | null {
   return readStorage(AUTH_TOKEN_KEY);
 }
 
+export function getAdminAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem("treko-admin-token");
+  } catch {
+    return null;
+  }
+}
+
+export function saveAdminAuthToken(token: string): void {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.setItem("treko-admin-token", token);
+  }
+}
+
+export function clearAdminAuthToken(): void {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem("treko-admin-token");
+  }
+}
+
 export function saveAuthSession(token: string, user: TrekoUser): void {
   writeStorage(AUTH_TOKEN_KEY, token);
   writeStorage(CURRENT_USER_KEY, JSON.stringify(user));
@@ -186,7 +207,12 @@ export async function signInDemo({ email, password }: AuthCredentials): Promise<
   return normalizedUser;
 }
 
-export async function registerDemo({ firstName, lastName, email, password }: RegistrationDetails): Promise<TrekoUser> {
+export async function registerDemo({
+  firstName,
+  lastName,
+  email,
+  password,
+}: RegistrationDetails): Promise<TrekoUser> {
   const response = await fetch(getApiUrl("/api/auth/signup"), {
     method: "POST",
     headers: {

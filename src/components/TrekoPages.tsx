@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
 import { ArrowRight, BedDouble, CarFront, Check, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/TrekoLanding";
+import { ImageCarousel } from "@/components/ImageCarousel";
 import { createListingUrl, destinations, operators, stays } from "@/data/treko";
+import { PartnerPage as PartnerPortalPage } from "@/components/PartnerPortal";
 
 function PageFrame({ children }: { children: ReactNode }) {
   return <main className="min-h-screen bg-background"><div className="relative h-20 bg-hero"><Navbar /></div>{children}</main>;
@@ -18,14 +19,76 @@ export function ExplorePage() {
 }
 
 export function StaysPage() {
-  return <PageFrame><section className="section-pad bg-secondary"><div className="mx-auto max-w-7xl px-5 md:px-8"><PageIntro eyebrow="Accommodation" title="Stays across India" copy="Browse every stay currently listed in Treko. Details and prices are prototype information."/><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{stays.map((item) => <article key={item.name} className="overflow-hidden rounded-2xl bg-card shadow-card"><div className="relative aspect-[4/3] overflow-hidden"><img src={item.image} alt={`${item.name} accommodation`} loading="lazy" className="h-full w-full object-cover"/><span className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1.5 text-xs font-bold">{item.type}</span></div><div className="p-5"><div className="flex items-start justify-between gap-3"><div><h2 className="font-display text-xl font-semibold">{item.name}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3"/>{item.location}</p></div><span className="flex items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary"/>{item.rating}</span></div><div className="my-4 flex flex-wrap gap-2">{item.amenities.map((amenity) => <span className="tag" key={amenity}><Check/>{amenity}</span>)}</div><div className="flex items-center justify-between border-t border-border pt-4"><p><span className="font-display text-xl font-bold">{item.priceLabel ?? item.price}</span></p><a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Hotel</a></div></div></article>)}</div><p className="mt-5 text-center text-xs text-muted-foreground">Prototype listings and prices shown for demonstration only.</p></div></section></PageFrame>;
+  return (
+    <PageFrame>
+      <section className="section-pad bg-secondary">
+        <div className="mx-auto max-w-7xl px-5 md:px-8">
+          <PageIntro eyebrow="Accommodation" title="Stays across India" copy="Browse every stay currently listed in Treko. Details and prices are prototype information." />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {stays.map((item) => (
+              <article key={item.name} className="overflow-hidden rounded-2xl bg-card shadow-card">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <ImageCarousel images={item.images} label={item.name} className="absolute inset-0" />
+                  <span className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1.5 text-xs font-bold">{item.type}</span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="font-display text-xl font-semibold">{item.name}</h2>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3" />{item.location}</p>
+                    </div>
+                    <span className="flex items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary" />{item.rating}</span>
+                  </div>
+                  <div className="my-4 flex flex-wrap gap-2">{item.amenities.map((amenity) => <span className="tag" key={amenity}><Check />{amenity}</span>)}</div>
+                  <div className="flex items-center justify-between border-t border-border pt-4">
+                    <p><span className="font-display text-xl font-bold">{item.priceLabel ?? item.price}</span></p>
+                    <a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Hotel</a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-5 text-center text-xs text-muted-foreground">Prototype listings and prices shown for demonstration only.</p>
+        </div>
+      </section>
+    </PageFrame>
+  );
 }
 
 export function CabOperatorsPage() {
-  return <PageFrame><section className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><PageIntro eyebrow="Local travel" title="Cab operators" copy="Explore all operator listings currently available in Treko and the areas they serve."/><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{operators.map((item) => <article key={item.name} className="rounded-2xl border border-border bg-card p-6 shadow-card"><div className="flex items-start justify-between"><span className="grid size-12 place-items-center rounded-xl bg-accent font-display font-bold text-primary">{item.initials}</span><span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold"><Star className="size-3 fill-primary text-primary"/>{item.rating}</span></div><h2 className="mt-5 font-display text-xl font-semibold">{item.name}</h2><div className="mt-5 space-y-4 text-sm"><p><span className="font-semibold">Serving</span><br/><span className="text-muted-foreground">{item.serving}</span></p><p><span className="font-semibold">Vehicles</span><br/><span className="text-muted-foreground">{item.vehicles}</span></p><p><span className="font-semibold">Services</span><br/><span className="text-muted-foreground">{item.services}</span></p></div><div className="mt-6 flex items-center justify-between border-t border-border pt-5"><p className="text-sm font-bold text-primary">{item.price}</p><a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Cab</a></div></article>)}</div><p className="mt-5 text-center text-xs text-muted-foreground">Prototype operator details are illustrative and not verified listings.</p></div></section></PageFrame>;
+  return <PageFrame>
+    <section className="section-pad">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <PageIntro eyebrow="Local travel" title="Cab operators" copy="Explore all operator listings currently available in Treko and the areas they serve." />
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {operators.map((item) => (
+            <article key={item.name} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <ImageCarousel images={item.images} label={item.name} className="mb-5 aspect-[16/9] rounded-xl" />
+              <div className="flex items-start justify-between">
+                <span className="grid size-12 place-items-center rounded-xl bg-accent font-display font-bold text-primary">{item.initials}</span>
+                <span className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold"><Star className="size-3 fill-primary text-primary" />{item.rating}</span>
+              </div>
+              <h2 className="mt-5 font-display text-xl font-semibold">{item.name}</h2>
+              <div className="mt-3 text-sm">
+                <p className="font-semibold">Services</p>
+                <p className="mt-1 text-muted-foreground">
+                  {item.services.slice(0, 2).join(" • ")}
+                  {item.services.length > 2 ? " etc." : ""}
+                </p>
+              </div>
+              <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
+                <p className="text-sm font-bold text-primary">{item.price}</p>
+                <a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Cab</a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="mt-5 text-center text-xs text-muted-foreground">Prototype operator details are illustrative and not verified listings.</p>
+      </div>
+    </section>
+  </PageFrame>;
 }
 
 export function PartnerPage() {
-  const [submitted, setSubmitted] = useState(false);
-  return <PageFrame><section className="section-pad"><div className="mx-auto grid max-w-6xl gap-10 px-5 md:grid-cols-[.9fr_1.1fr] md:px-8"><div><p className="section-label">Grow with Treko</p><h1 className="mt-3 font-display text-4xl font-semibold md:text-5xl">Become a Partner</h1><p className="mt-5 leading-7 text-muted-foreground">Bring your local business to travellers planning their next journey across India.</p><div className="mt-8 space-y-4">{["Hotels and stays","Cab operators","Local guides"].map((label) => <div key={label} className="flex items-center gap-3 rounded-xl bg-secondary p-4"><span className="grid size-9 place-items-center rounded-full bg-accent text-primary"><Check className="size-4"/></span><span className="font-semibold">{label}</span></div>)}</div></div><form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }} className="rounded-2xl border border-border bg-card p-6 shadow-card md:p-8"><h2 className="font-display text-2xl font-semibold">Tell us about your business</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Share your details and choose the type of partnership you are interested in.</p><label className="mt-6 block text-sm font-semibold">Business name<input required name="business" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal outline-none focus:ring-2 focus:ring-ring"/></label><label className="mt-4 block text-sm font-semibold">Your name<input required name="name" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal outline-none focus:ring-2 focus:ring-ring"/></label><label className="mt-4 block text-sm font-semibold">Email<input required type="email" name="email" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal outline-none focus:ring-2 focus:ring-ring"/></label><label className="mt-4 block text-sm font-semibold">Partnership type<select required name="type" defaultValue="" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal"><option value="" disabled>Select a category</option><option>Hotel or stay</option><option>Cab operator</option><option>Local guide</option></select></label><Button type="submit" className="mt-6 h-12 w-full rounded-full">Send partnership enquiry<ArrowRight/></Button>{submitted && <p role="status" className="mt-4 text-sm text-primary">Thanks for your interest. This prototype form is ready for connection to Treko’s partner registration service.</p>}</form></div></section></PageFrame>;
+  return <PartnerPortalPage />;
 }

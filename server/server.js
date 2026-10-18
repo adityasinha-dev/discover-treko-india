@@ -3,6 +3,10 @@ import dotenv from "dotenv";
 import express from "express";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import partnerRoutes from "./routes/partnerRoutes.js";
+import businessRoutes from "./routes/businessRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 dotenv.config();
 
@@ -23,6 +27,10 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/partners", partnerRoutes);
+app.use("/api/business", businessRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 app.use((error, req, res, next) => {
   console.error(error);

@@ -1,8 +1,28 @@
-import { ArrowRight, BedDouble, Building2, CarFront, Compass, Headphones, MapPin, Menu, Route, ShieldCheck, Star } from "lucide-react";
+import {
+  ArrowRight,
+  BedDouble,
+  Building2,
+  CarFront,
+  Compass,
+  Headphones,
+  MapPin,
+  Menu,
+  Route,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import heroImage from "@/assets/hero-ujjain.jpg";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { destinations } from "@/data/treko";
 import { getCurrentUser, logoutDemo, type TrekoUser } from "@/lib/auth";
 
@@ -26,8 +46,21 @@ export function Logo() {
   );
 }
 
+export function Footer() {
+  return (
+    <footer className="border-t border-border bg-secondary/50">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-muted-foreground sm:flex-row md:px-8">
+        <p>© {new Date().getFullYear()} Treko. Travel local.</p>
+        <a href="/admin/login" className="transition-colors hover:text-primary">
+          Admin Login
+        </a>
+      </div>
+    </footer>
+  );
+}
+
 export function Navbar() {
-  const [currentUser, setCurrentUser] = useState<TrekoUser | null>(getCurrentUser);
+  const [currentUser, setCurrentUser] = useState<TrekoUser | null>(null);
 
   useEffect(() => {
     const syncUser = () => setCurrentUser(getCurrentUser());
@@ -47,7 +80,11 @@ export function Navbar() {
         <Logo />
         <nav className="hidden items-center justify-center gap-7 lg:flex">
           {nav.map(([label, href]) => (
-            <a key={href} href={href} className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary">
+            <a
+              key={href}
+              href={href}
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            >
               {label}
             </a>
           ))}
@@ -61,7 +98,12 @@ export function Navbar() {
               <Button variant="ghost" asChild>
                 <a href="/my-plans">My Plans</a>
               </Button>
-              <Button variant="outline" onClick={handleLogout}>Logout</Button>
+              <Button variant="ghost" asChild>
+                <a href="/business-dashboard">Business Dashboard</a>
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
             </>
           ) : (
             <>
@@ -79,7 +121,12 @@ export function Navbar() {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="icon" variant="outline" className="rounded-full lg:hidden" aria-label="Open navigation">
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full lg:hidden"
+              aria-label="Open navigation"
+            >
               <Menu />
             </Button>
           </SheetTrigger>
@@ -93,7 +140,10 @@ export function Navbar() {
             <nav className="mt-10 flex flex-col gap-2">
               {nav.map(([label, href]) => (
                 <SheetClose asChild key={href}>
-                  <a href={href} className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">
+                  <a
+                    href={href}
+                    className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent"
+                  >
                     {label}
                   </a>
                 </SheetClose>
@@ -103,11 +153,19 @@ export function Navbar() {
                   <Button variant="outline" asChild className="mt-4">
                     <a href="/my-plans">My Plans</a>
                   </Button>
-                  <Button onClick={handleLogout} className="mt-2">Logout</Button>
+                  <Button variant="outline" asChild className="mt-2">
+                    <a href="/business-dashboard">Business Dashboard</a>
+                  </Button>
+                  <Button onClick={handleLogout} className="mt-2">
+                    Logout
+                  </Button>
                 </>
               ) : (
                 <SheetClose asChild>
-                  <a href="/login" className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent">
+                  <a
+                    href="/login"
+                    className="rounded-md px-3 py-3 text-lg font-semibold hover:bg-accent"
+                  >
                     Login
                   </a>
                 </SheetClose>
@@ -178,7 +236,6 @@ function Hero() {
               {currentUser ? "My Plans" : "Get Started"} <ArrowRight />
             </a>
           </Button>
-
         </div>
 
         <div className="relative mx-auto w-full max-w-[510px] md:translate-y-5">
@@ -193,8 +250,12 @@ function Hero() {
           </div>
 
           <div className="absolute left-4 top-5 rounded-xl bg-card/90 px-4 py-3 shadow-lg backdrop-blur md:-left-8 md:top-10">
-            <p className="text-[10px] font-semibold uppercase text-muted-foreground">Featured destination</p>
-            <p className="mt-0.5 font-display text-sm font-bold text-foreground">Ujjain, Madhya Pradesh</p>
+            <p className="text-[10px] font-semibold uppercase text-muted-foreground">
+              Featured destination
+            </p>
+            <p className="mt-0.5 font-display text-sm font-bold text-foreground">
+              Ujjain, Madhya Pradesh
+            </p>
           </div>
 
           <div className="absolute -bottom-6 right-4 rounded-xl bg-card px-4 py-3 shadow-lg md:-right-5">
@@ -214,7 +275,15 @@ function Hero() {
   );
 }
 
-function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+function SectionHeading({
+  eyebrow,
+  title,
+  copy,
+}: {
+  eyebrow: string;
+  title: string;
+  copy: string;
+}) {
   return (
     <div className="mx-auto mb-10 max-w-2xl text-center">
       <p className="section-label">{eyebrow}</p>
@@ -256,7 +325,9 @@ function Destinations() {
               <div className="p-5">
                 <p className="text-xs font-bold uppercase text-primary">{item.state}</p>
                 <h3 className="mt-1 font-display text-2xl font-semibold">{item.name}</h3>
-                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">
+                  {item.description}
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className="tag">
                     <BedDouble />
@@ -267,7 +338,11 @@ function Destinations() {
                     {item.cabs}
                   </span>
                 </div>
-                <Button variant="ghost" asChild className="mt-4 w-full justify-between px-0 hover:bg-transparent hover:text-primary">
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="mt-4 w-full justify-between px-0 hover:bg-transparent hover:text-primary"
+                >
                   <a href="/stays">
                     Explore {item.name}
                     <ArrowRight />
@@ -284,8 +359,16 @@ function Destinations() {
 
 const steps = [
   [MapPin, "Choose Your Destination", "Select a city or destination anywhere across India."],
-  [BedDouble, "Find Your Stay", "Explore hotels, resorts, homestays and other accommodation options."],
-  [CarFront, "Find Local Cab Operators", "Discover operators serving the destination and surrounding regions."],
+  [
+    BedDouble,
+    "Find Your Stay",
+    "Explore hotels, resorts, homestays and other accommodation options.",
+  ],
+  [
+    CarFront,
+    "Find Local Cab Operators",
+    "Discover operators serving the destination and surrounding regions.",
+  ],
   [Compass, "Plan Your Trip", "Compare your options and contact or book through the provider."],
 ];
 
@@ -309,7 +392,9 @@ function HowItWorks() {
                   <StepIcon className="size-5" />
                 </div>
                 <p className="mt-6 text-xs font-bold uppercase text-primary">Step {index + 1}</p>
-                <h3 className="mt-2 font-display text-2xl font-semibold text-foreground">{title}</h3>
+                <h3 className="mt-2 font-display text-2xl font-semibold text-foreground">
+                  {title}
+                </h3>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{copy}</p>
               </div>
             );
@@ -332,17 +417,34 @@ function WhyTreko() {
 
         <div className="grid gap-5 md:grid-cols-3">
           {[
-            [ShieldCheck, "Verified local focus", "Discover routes and stays with a destination-first mindset."],
-            [Building2, "Easy trip planning", "Bring the stay, transport and guide together without the noise."],
-            [Headphones, "Travel support", "Plan a trip with local guidance and the essentials you need for a smoother stay."],
+            [
+              ShieldCheck,
+              "Verified local focus",
+              "Discover routes and stays with a destination-first mindset.",
+            ],
+            [
+              Building2,
+              "Easy trip planning",
+              "Bring the stay, transport and guide together without the noise.",
+            ],
+            [
+              Headphones,
+              "Travel support",
+              "Plan a trip with local guidance and the essentials you need for a smoother stay.",
+            ],
           ].map(([Icon, title, copy]) => {
             const FeatureIcon = Icon as any;
             return (
-              <div key={String(title)} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <div
+                key={String(title)}
+                className="rounded-2xl border border-border bg-card p-6 shadow-card"
+              >
                 <span className="grid size-12 place-items-center rounded-xl bg-accent text-primary">
                   <FeatureIcon className="size-5" />
                 </span>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">{title}</h3>
+                <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">
+                  {title}
+                </h3>
                 <p className="mt-3 leading-7 text-muted-foreground">{copy}</p>
               </div>
             );
@@ -365,12 +467,27 @@ function Highlights() {
 
         <div className="grid gap-5 md:grid-cols-4">
           {[
-            ["4.8/5 average rating", "Travelers appreciate the clarity and ease of planning at a destination level."],
-            ["100+ curated places", "Browse destination-focused stays, stays and local operators across India."],
-            ["Trusted local context", "Experience the destination with local knowledge and practical planning support."],
-            ["Fast trip discovery", "Compare options quickly to find the right fit for your timetable and budget."],
+            [
+              "4.8/5 average rating",
+              "Travelers appreciate the clarity and ease of planning at a destination level.",
+            ],
+            [
+              "100+ curated places",
+              "Browse destination-focused stays, stays and local operators across India.",
+            ],
+            [
+              "Trusted local context",
+              "Experience the destination with local knowledge and practical planning support.",
+            ],
+            [
+              "Fast trip discovery",
+              "Compare options quickly to find the right fit for your timetable and budget.",
+            ],
           ].map(([title, copy]) => (
-            <div key={String(title)} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div
+              key={String(title)}
+              className="rounded-2xl border border-border bg-card p-6 shadow-card"
+            >
               <div className="mb-4 grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
                 <Star className="size-5 fill-primary text-primary" />
               </div>
@@ -399,7 +516,10 @@ function CTA() {
                 Browse a destination, compare stays and discover local operators in one place.
               </p>
             </div>
-            <Button asChild className="mt-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 md:mt-0">
+            <Button
+              asChild
+              className="mt-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 md:mt-0"
+            >
               <a href="/explore">
                 Explore the country <ArrowRight />
               </a>

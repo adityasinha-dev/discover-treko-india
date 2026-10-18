@@ -1,8 +1,6 @@
-import goaImage from "@/assets/destination-goa.jpg";
-import jaipurImage from "@/assets/destination-jaipur.jpg";
-import manaliImage from "@/assets/destination-manali.jpg";
+import goaImage from "@/assets/destination-manali.jpg";
+import shimlaImage from "@/assets/destination-goa.jpg";
 import rishikeshImage from "@/assets/destination-rishikesh.jpg";
-import jaipurStay from "@/assets/stay-jaipur.jpg";
 import rishikeshStay from "@/assets/stay-rishikesh.jpg";
 //Ujjain Images
 import ujjainImage from "@/assets/hero-ujjain.jpg";
@@ -14,21 +12,6 @@ import ujjainCover_05 from "@/assets/ujjain-cover-5.jpg";
 
 
 import ujjainStay from "@/assets/stay-ujjain.jpg";
-
-export const indianPlaces = [
-  "Ujjain, Madhya Pradesh",
-  "Indore, Madhya Pradesh",
-  "Jaipur, Rajasthan",
-  "Agra, Uttar Pradesh",
-  "Manali, Himachal Pradesh",
-  "Shimla, Himachal Pradesh",
-  "Rishikesh, Uttarakhand",
-  "Haridwar, Uttarakhand",
-  "Goa",
-  "Varanasi, Uttar Pradesh",
-  "Amritsar, Punjab",
-  "Ayodhya, Uttar Pradesh",
-];
 
 export type Destination = {
   id: string;
@@ -42,26 +25,104 @@ export type Destination = {
 };
 
 export const destinations: Destination[] = [
-  { id: "delhi", name: "Delhi", state: "Delhi", description: "Historic monuments, bustling markets and India’s capital story.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "mumbai", name: "Mumbai", state: "Maharashtra", description: "A vibrant coastal city of culture, food and cinema.", stays: "Explore stays", cabs: "Local cabs", image: goaImage },
-  { id: "goa", name: "Goa", state: "Goa", description: "Coastal villages, heritage quarters and relaxed beaches.", stays: "150+ stays", cabs: "41 cab operators", image: goaImage },
-  { id: "jaipur", name: "Jaipur", state: "Rajasthan", description: "Royal forts, lively bazaars and timeless architecture.", stays: "120+ stays", cabs: "32 cab operators", image: jaipurImage },
-  { id: "udaipur", name: "Udaipur", state: "Rajasthan", description: "Lakeside palaces, old city lanes and Aravalli views.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "agra", name: "Agra", state: "Uttar Pradesh", description: "Mughal landmarks and the marble wonder of the Taj Mahal.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "varanasi", name: "Varanasi", state: "Uttar Pradesh", description: "Ancient ghats, riverside rituals and storied lanes.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_01, images: [ujjainCover_01, ujjainCover_02, ujjainCover_03, ujjainCover_04, ujjainCover_05] },
-  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage },
-  { id: "manali", name: "Manali", state: "Himachal Pradesh", description: "Mountain roads, pine valleys and Himalayan escapes.", stays: "85+ stays", cabs: "24 cab operators", image: manaliImage },
-  { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
-  { id: "amritsar", name: "Amritsar", state: "Punjab", description: "A welcoming city known for the Golden Temple and Punjabi cuisine.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "hyderabad", name: "Hyderabad", state: "Telangana", description: "Deccan history, grand architecture and much-loved food.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "bengaluru", name: "Bengaluru", state: "Karnataka", description: "Garden-city calm, creative neighbourhoods and local cafés.", stays: "Explore stays", cabs: "Local cabs", image: rishikeshImage },
-  { id: "kolkata", name: "Kolkata", state: "West Bengal", description: "Art, literature and lively streets shaped by many eras.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "chennai", name: "Chennai", state: "Tamil Nadu", description: "Coastal promenades, classical arts and South Indian flavours.", stays: "Explore stays", cabs: "Local cabs", image: goaImage },
-  { id: "kerala", name: "Kerala", state: "Kerala", description: "Backwaters, green hill country and relaxed coastal escapes.", stays: "Explore stays", cabs: "Local cabs", image: goaImage },
-  { id: "jaisalmer", name: "Jaisalmer", state: "Rajasthan", description: "Golden sandstone streets and desert journeys under open skies.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "mysuru", name: "Mysuru", state: "Karnataka", description: "Palace heritage, broad boulevards and fragrant markets.", stays: "Explore stays", cabs: "Local cabs", image: jaipurImage },
-  { id: "darjeeling", name: "Darjeeling", state: "West Bengal", description: "Tea gardens, toy-train heritage and Himalayan sunrises.", stays: "Explore stays", cabs: "Local cabs", image: manaliImage },
+  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage, images: [rishikeshImage, rishikeshStay] },
+  { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_01, images: [ujjainCover_02, ujjainCover_01, ujjainImage, ujjainCover_03, ujjainCover_04, ujjainCover_05] },
+  { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: shimlaImage, images: [shimlaImage, rishikeshImage, rishikeshStay] },
+  { id: "goa", name: "Goa", state: "Goa", description: "Coastal villages, heritage quarters and relaxed beaches.", stays: "150+ stays", cabs: "41 cab operators", image: goaImage, images: [goaImage, rishikeshImage, ujjainCover_03] },
+  { id: "mumbai", name: "Mumbai", state: "Maharashtra", description: "A vibrant coastal city of culture, food and cinema.", stays: "Explore stays", cabs: "Local cabs", image: goaImage, images: [goaImage, rishikeshImage, ujjainCover_03] },
+];
+
+export const indianPlaces = destinations.map((destination) =>
+  destination.state === destination.name ? destination.name : `${destination.name}, ${destination.state}`,
+);
+export const supportedDestinationIds = destinations.map((destination) => destination.id);
+const supportedDestinationIdSet: ReadonlySet<string> = new Set(supportedDestinationIds);
+
+export const isSupportedDestination = (value: string) =>
+  destinations.some(
+    (destination) =>
+      destination.id === value.toLowerCase() || destination.name.toLowerCase() === value.toLowerCase(),
+  );
+
+export type RoomOption = {
+  id: string;
+  name: string;
+  bedType: string;
+  maxGuests: number;
+  beds: number;
+  price: number;
+  description: string;
+  amenities: string[];
+  image: string;
+};
+
+export const buildHotelRoomOptions = (basePrice: number, image: string): RoomOption[] => [
+  {
+    id: "deluxe-double-room",
+    name: "Deluxe Room",
+    bedType: "Double Bed",
+    maxGuests: 2,
+    beds: 1,
+    price: basePrice,
+    description: "A bright, restful room with everyday essentials and a comfortable city stay experience.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast"],
+    image,
+  },
+  {
+    id: "luxury-king-room",
+    name: "Luxury Room",
+    bedType: "King Bed",
+    maxGuests: 2,
+    beds: 1,
+    price: basePrice + 900,
+    description: "An elevated room with premium finishes, extra comfort, and a more polished travel experience.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast", "City View"],
+    image,
+  },
+  {
+    id: "premium-room",
+    name: "Premium Room",
+    bedType: "King Bed",
+    maxGuests: 3,
+    beds: 1,
+    price: basePrice + 1300,
+    description: "A spacious stay for small families or friends wanting more room to relax and unwind.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast", "Workspace"],
+    image,
+  },
+  {
+    id: "family-room",
+    name: "Family Room",
+    bedType: "Queen + Extra Bed",
+    maxGuests: 4,
+    beds: 2,
+    price: basePrice + 1700,
+    description: "A flexible room configuration designed for families and longer stays with extra comfort.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast", "Family Dining"],
+    image,
+  },
+  {
+    id: "executive-room",
+    name: "Executive Room",
+    bedType: "King Bed",
+    maxGuests: 3,
+    beds: 1,
+    price: basePrice + 2200,
+    description: "A polished executive room with elevated amenities for a more premium overnight stay.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast", "Lounge Access"],
+    image,
+  },
+  {
+    id: "suite-room",
+    name: "Suite",
+    bedType: "King Bed + Sofa Bed",
+    maxGuests: 5,
+    beds: 2,
+    price: basePrice + 3000,
+    description: "A larger suite for travellers who want space, privacy, and a more indulgent stay.",
+    amenities: ["AC", "Wi‑Fi", "Breakfast", "Premium Toiletries", "City View"],
+    image,
+  },
 ];
 
 export const hotels = [
@@ -118,33 +179,6 @@ export const hotels = [
     checkInTime: "13:00",
     checkOutTime: "11:00",
     roomInfo: "River View Room • 2 Guests • 1 Room",
-  },
-  {
-    id: "amber-courtyard-haveli",
-    slug: "amber-courtyard-haveli",
-    destinationId: "jaipur",
-    destination: "Jaipur",
-    name: "Amber Courtyard Haveli",
-    location: "Jaipur, Rajasthan",
-    type: "Heritage stay",
-    rating: 4.8,
-    price: 3850,
-    priceLabel: "₹3,850 / night",
-    image: jaipurStay,
-    images: [jaipurStay, jaipurImage],
-    description: "A heritage-inspired haveli in the heart of Jaipur with a courtyard, local-curated experiences, and warm hospitality.",
-    amenities: ["Breakfast", "Courtyard", "Local tours", "Parking", "Wi-Fi"],
-    availability: "Available for 12 Oct – 25 Oct",
-    terms: [
-      "Check-in time: 1:30 PM",
-      "Check-out time: 12:00 PM",
-      "Free cancellation up to 48 hours before arrival.",
-      "A valid photo ID is required for all guests.",
-      "Complimentary local tour suggestions are subject to availability.",
-    ],
-    checkInTime: "13:30",
-    checkOutTime: "12:00",
-    roomInfo: "Heritage Suite • 2 Guests • 1 Room",
   },
   {
     id: "mahakal-residency",
@@ -238,7 +272,7 @@ export const cabOperators = [
     initials: "UT",
     name: "Ujjain Cab Services",
     image: ujjainImage,
-    images: [ujjainImage, jaipurImage, rishikeshImage],
+    images: [ujjainImage, ujjainCover_01, ujjainCover_02],
     description: "Reliable local transport for temple routes, heritage pathways, and day trips around Ujjain with trained drivers.",
     rating: 4.7,
     vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
@@ -258,56 +292,6 @@ export const cabOperators = [
     ],
   },
   {
-    id: "himalayan-route-travels",
-    slug: "himalayan-route-travels",
-    destinationId: "manali",
-    destination: "Manali",
-    initials: "HR",
-    name: "Himalayan Route Travels",
-    image: manaliImage,
-    description: "Mountain-specialist cab service covering valley routes, scenic day trips, and family travel around Manali.",
-    rating: 4.8,
-    vehicleTypes: ["Hatchback", "SUV", "Traveller"],
-    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
-    pricing: "Contact for pricing",
-    price: 2200,
-    services: ["Mountain routes", "Transfers", "Local tours"],
-    pickupInfo: "Hotel pickup or bus stand pickup",
-    dropInfo: "Solang, Kasol, Rohtang, and nearby spots",
-    availability: "Available on request based on local weather and route conditions",
-    terms: [
-      "Weather-related changes may require route adjustments.",
-      "Waiting time beyond 20 minutes is chargeable.",
-      "All outstation packages are subject to road condition updates.",
-      "Extra luggage allowance depends on the chosen vehicle.",
-    ],
-  },
-  {
-    id: "pink-city-cabs",
-    slug: "pink-city-cabs",
-    destinationId: "jaipur",
-    destination: "Jaipur",
-    initials: "JP",
-    name: "Pink City Cabs",
-    image: jaipurImage,
-    description: "Curated city rides for Jaipur sightseeing, shopping lanes, and heritage visits around Rajasthan.",
-    rating: 4.6,
-    vehicleTypes: ["Sedan", "SUV", "Premium"],
-    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 5 passengers"],
-    pricing: "From ₹1,500 / day",
-    price: 1500,
-    services: ["City tours", "Outstation rides", "Airport transfer"],
-    pickupInfo: "Airport, railway station, or hotel pickup",
-    dropInfo: "Heritage routings and tourist circuits",
-    availability: "Available every day",
-    terms: [
-      "Cancellation must be requested at least 2 hours before pickup.",
-      "Extra distance over the quoted route is billed additionally.",
-      "Driver contact rules are shared post-booking.",
-      "No alcohol or smoking inside the vehicle.",
-    ],
-  },
-  {
     id: "mahakal-city-rides",
     slug: "mahakal-city-rides",
     destinationId: "ujjain",
@@ -315,7 +299,7 @@ export const cabOperators = [
     initials: "MC",
     name: "Mahakal City Rides",
     image: ujjainImage,
-    images: [ujjainImage, manaliImage, rishikeshImage],
+    images: [ujjainImage, ujjainCover_01, ujjainCover_02],
     description: "Fast and local city rides for temple circles, ghats, and airport-to-hotel transfers around Ujjain.",
     rating: 4.5,
     vehicleTypes: ["Sedan", "SUV", "Mini Van"],
@@ -341,7 +325,7 @@ export const cabOperators = [
     initials: "ST",
     name: "Shipra Travel Link",
     image: ujjainImage,
-    images: [ujjainImage, jaipurImage, goaImage],
+    images: [ujjainImage, ujjainCover_01, ujjainCover_02],
     description: "Comfort-first cab service for pilgrims and travellers who want reliable local travel and smoother temple-day connections.",
     rating: 4.7,
     vehicleTypes: ["Sedan", "SUV", "Traveller"],
@@ -367,7 +351,7 @@ export const cabOperators = [
     initials: "UH",
     name: "Ujjain Heritage Cabs",
     image: ujjainImage,
-    images: [ujjainImage, manaliImage, rishikeshImage],
+    images: [ujjainImage, ujjainCover_01, ujjainCover_02],
     description: "A heritage-conscious local transport choice for guided temple itineraries, family outings, and spiritual day tours.",
     rating: 4.8,
     vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
@@ -437,42 +421,6 @@ export const travelGuides = [
       "Maximum group size is 6 guests per guide.",
       "Temple entry or special darshan charges are not included in the package.",
       "Additional site transfer charges are applicable beyond the quoted route.",
-    ],
-  },
-  {
-    id: "arjun-jaipur-guide",
-    slug: "arjun-jaipur-guide",
-    destinationId: "jaipur",
-    destination: "Jaipur",
-    name: "Arjun Singh",
-    image: jaipurImage,
-    description: "Arjun shares Jaipur's royal stories, local kitchens, and old-city movements with colour and context.",
-    rating: 4.8,
-    languages: ["Hindi", "English", "French"],
-    experience: "6 years",
-    specialization: "Heritage walks & food trails",
-    price: 1500,
-    priceLabel: "₹1,500 / day",
-    availability: "Available for city heritage experiences",
-    duration: "1 day",
-    destinationsCovered: ["Amber Fort", "Hawa Mahal", "City Palace", "Jalebi Chowk"],
-    packages: [
-      {
-        id: "royal-city-walk",
-        name: "Royal Jaipur Walk",
-        price: 2800,
-        duration: "1 day",
-        startingPoint: "Hotel",
-        destinationsCovered: ["Amber Fort", "Hawa Mahal", "City Palace"],
-        itinerary: [{ day: "Day 1", stops: ["Amber Fort", "Hawa Mahal", "City Palace"] }],
-      },
-    ],
-    terms: [
-      "Meet point is confirmed via message before pick-up.",
-      "Tour duration is subject to pace and traffic conditions.",
-      "Cancellation before 12 hours is free.",
-      "Maximum group size is 5 guests.",
-      "Food tastings are additional unless otherwise noted.",
     ],
   },
   {
@@ -635,7 +583,8 @@ export const getGuidesForDestination = (destinationId: string) => guides.filter(
 export const getStayBySlug = (slug: string) => stays.find((stay) => stay.slug === slug);
 export const getCabBySlug = (slug: string) => operators.find((operator) => operator.slug === slug);
 export const getGuideBySlug = (slug: string) => guides.find((guide) => guide.slug === slug);
-export const createListingUrl = (destinationId: string, slug: string) => `/${destinationId}/${slug}`;
+export const createListingUrl = (destinationId: string, slug: string) =>
+  supportedDestinationIdSet.has(destinationId) ? `/${destinationId}/${slug}` : "/explore";
 export const getDestinationBySlug = (destinationId: string) => destinations.find((destination) => destination.id === destinationId);
 export const getListingBySlug = (destinationId: string, slug: string) => {
   const stay = getStayBySlug(slug);

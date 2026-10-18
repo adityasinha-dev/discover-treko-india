@@ -7,6 +7,7 @@
     "dev": "vite dev",
     "dev:server": "nodemon server/server.js",
     "server": "node server/server.js",
+    "test:server": "node --test server/tests/partnerWorkflow.test.js",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
