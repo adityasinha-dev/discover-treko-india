@@ -8,8 +8,10 @@ import { loginAdmin } from "../controllers/adminController.js";
 import {
   createBooking,
   getBusinessDashboard,
+  getPublicCabVehicleImages,
   reviewPartnerApplication,
   submitPartnerApplication,
+  updateVehicleImages,
 } from "../controllers/partnerController.js";
 import { requireAdmin, requireApprovedBusiness, revokeAdminToken } from "../middleware/business.js";
 import { createAdminLoginRateLimit } from "../middleware/adminLoginRateLimit.js";
@@ -239,6 +241,115 @@ test("application submission creates a pending application bound to the authenti
   assert.equal(savedApplication.ownerEmail, "owner@example.com");
   assert.equal(savedApplication.status, "pending");
   assert.equal(res.body.application.status, "pending");
+});
+
+test("approved cab operators can save vehicle photos on only their own listing", async () => {
+  const listingId = "listing-id";
+  const listing = {
+    _id: { toString: () => listingId },
+    name: "City Cabs",
+    type: "Cab Operator",
+    destination: "Ujjain",
+    description: "Local rides.",
+    vehicleOptions: [
+      { name: "Sedan", seatingCapacity: "Up to 4 passengers", images: [] },
+      { name: "SUV", seatingCapacity: "Up to 6 passengers", images: [] },
+    ],
+  };
+  const listings = [listing];
+  listings.id = (candidateId) => (candidateId === listingId ? listing : null);
+  const business = {
+    _id: { toString: () => "business-id" },
+    businessName: "City Cabs",
+    ownerName: "Owner",
+    ownerEmail: "owner@example.com",
+    phone: "1234567890",
+    businessType: "Cab Operator",
+    destination: "Ujjain",
+    description: "Local rides.",
+    status: "approved",
+    reviewNote: "",
+    createdAt: new Date(),
+    reviewedAt: null,
+    listings,
+    save: async () => {},
+  };
+  const image = "data:image/jpeg;base64,/9j/AA==";
+  const res = mockResponse();
+
+  await updateVehicleImages(
+    {
+      params: { listingId, vehicleName: "SUV" },
+      body: { images: [image] },
+      business,
+    },
+    res,
+    (error) => {
+      throw error;
+    },
+  );
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body.listing.vehicleOptions[1].images, [image]);
+  assert.deepEqual(res.body.listing.vehicleOptions[0].images, []);
+});
+
+test("vehicle photo updates reject unsupported image data and oversized galleries", async () => {
+  const res = mockResponse();
+  await updateVehicleImages(
+    {
+      params: { listingId: "listing-id", vehicleName: "Sedan" },
+      body: { images: ["data:image/svg+xml;base64,PHN2Zy8+"] },
+      business: { listings: { id: () => null } },
+    },
+    res,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(res.statusCode, 400);
+
+  const tooManyImagesResponse = mockResponse();
+  await updateVehicleImages(
+    {
+      params: { listingId: "listing-id", vehicleName: "Sedan" },
+      body: { images: Array.from({ length: 5 }, () => "data:image/jpeg;base64,/9j/AA==") },
+      business: { listings: { id: () => null } },
+    },
+    tooManyImagesResponse,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(tooManyImagesResponse.statusCode, 400);
+});
+
+test("public cab vehicle photos are returned only for approved matching listings", async () => {
+  const image = "data:image/jpeg;base64,/9j/AA==";
+  PartnerApplication.findOne = () => ({
+    select: async () => ({
+      listings: [
+        {
+          name: "City Cabs",
+          type: "Cab Operator",
+          destination: "Ujjain",
+          vehicleOptions: [{ name: "SUV", images: [image] }],
+        },
+      ],
+    }),
+  });
+  const res = mockResponse();
+
+  await getPublicCabVehicleImages(
+    { query: { name: "City Cabs", destination: "Ujjain" } },
+    res,
+    (error) => {
+      throw error;
+    },
+  );
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body.vehicleOptions, [{ name: "SUV", images: [image] }]);
 });
 
 test("admin login returns a role-scoped token and invalid credentials share a generic response", async () => {

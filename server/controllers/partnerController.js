@@ -4,6 +4,22 @@ import PartnerApplication from "../models/PartnerApplication.js";
 
 const allowedBusinessTypes = new Set(["Hotel", "Cab Operator", "Travel Guide"]);
 const allowedDestinations = new Set(["Rishikesh", "Ujjain", "Shimla", "Goa", "Mumbai"]);
+const defaultCabVehicles = [
+  { name: "Sedan", seatingCapacity: "Up to 4 passengers" },
+  { name: "SUV", seatingCapacity: "Up to 6 passengers" },
+  { name: "Tempo Traveller", seatingCapacity: "Up to 12 passengers" },
+  { name: "Mini Van", seatingCapacity: "Up to 8 passengers" },
+];
+const allowedVehicleNames = new Set(defaultCabVehicles.map((vehicle) => vehicle.name));
+const maxVehicleImageBytes = 512 * 1024;
+const maxVehicleImages = 4;
+
+const getVehicleOptions = (listing) =>
+  listing.vehicleOptions?.length
+    ? listing.vehicleOptions
+    : listing.type === "Cab Operator"
+      ? defaultCabVehicles.map((vehicle) => ({ ...vehicle, images: [] }))
+      : [];
 
 const toPublicApplication = (application) => ({
   id: application._id.toString(),
@@ -24,6 +40,11 @@ const toPublicApplication = (application) => ({
     type: listing.type,
     destination: listing.destination,
     description: listing.description,
+    vehicleOptions: getVehicleOptions(listing).map((vehicle) => ({
+      name: vehicle.name,
+      seatingCapacity: vehicle.seatingCapacity,
+      images: vehicle.images,
+    })),
     createdAt: listing.createdAt,
   })),
 });
@@ -88,6 +109,10 @@ export const submitPartnerApplication = async (req, res, next) => {
           type: businessType,
           destination,
           description: description.trim(),
+          vehicleOptions:
+            businessType === "Cab Operator"
+              ? defaultCabVehicles.map((vehicle) => ({ ...vehicle, images: [] }))
+              : [],
         },
       ],
     });
@@ -99,6 +124,104 @@ export const submitPartnerApplication = async (req, res, next) => {
         .status(409)
         .json({ message: "A partnership application already exists for this account." });
     }
+    return next(error);
+  }
+};
+
+export const updateVehicleImages = async (req, res, next) => {
+  try {
+    const { listingId, vehicleName } = req.params;
+    const images = req.body?.images;
+
+    if (!Array.isArray(images) || images.length > maxVehicleImages) {
+      return res.status(400).json({ message: "Choose between 0 and 4 vehicle photos." });
+    }
+
+    if (!images.every((image) => {
+      if (typeof image !== "string") return false;
+      const match = image.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/);
+      if (!match || match[2].length % 4 !== 0) return false;
+      const bytes = Buffer.from(match[2], "base64");
+      if (bytes.length === 0 || bytes.length > maxVehicleImageBytes) return false;
+      if (match[1] === "jpeg") {
+        return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+      }
+      if (match[1] === "png") {
+        return bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+      }
+      return (
+        bytes.length >= 12 &&
+        bytes.toString("ascii", 0, 4) === "RIFF" &&
+        bytes.toString("ascii", 8, 12) === "WEBP"
+      );
+    })) {
+      return res.status(400).json({
+        message: "Vehicle photos must be valid JPEG, PNG, or WebP images no larger than 512 KB each.",
+      });
+    }
+
+    if (!allowedVehicleNames.has(vehicleName)) {
+      return res.status(400).json({ message: "Choose a supported vehicle type." });
+    }
+
+    const listing = req.business.listings.id(listingId);
+    if (!listing || listing.type !== "Cab Operator") {
+      return res.status(404).json({ message: "Cab listing not found." });
+    }
+
+    if (!listing.vehicleOptions?.some((option) => option.name === vehicleName)) {
+      listing.vehicleOptions = getVehicleOptions(listing);
+    }
+    const selectedVehicle = listing.vehicleOptions.find((option) => option.name === vehicleName);
+    if (!selectedVehicle) {
+      return res.status(404).json({ message: "Vehicle option not found." });
+    }
+
+    selectedVehicle.images = images;
+    await req.business.save();
+
+    return res.status(200).json({
+      listing: toPublicApplication(req.business).listings.find((item) => item.id === listingId),
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getPublicCabVehicleImages = async (req, res, next) => {
+  try {
+    const { name, destination } = req.query;
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      name.trim().length > 120 ||
+      typeof destination !== "string" ||
+      !allowedDestinations.has(destination)
+    ) {
+      return res.status(400).json({ message: "A valid cab listing name and destination are required." });
+    }
+
+    const application = await PartnerApplication.findOne({
+      status: "approved",
+      "listings.name": name.trim(),
+      "listings.destination": destination,
+      "listings.type": "Cab Operator",
+    }).select("listings");
+
+    const listing = application?.listings.find(
+      (item) =>
+        item.name === name.trim() &&
+        item.destination === destination &&
+        item.type === "Cab Operator",
+    );
+
+    return res.status(200).json({
+      vehicleOptions: listing?.vehicleOptions?.map((vehicle) => ({
+        name: vehicle.name,
+        images: vehicle.images,
+      })) ?? [],
+    });
+  } catch (error) {
     return next(error);
   }
 };

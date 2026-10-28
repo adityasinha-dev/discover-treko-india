@@ -15,7 +15,7 @@ function PageIntro({ eyebrow, title, copy }: { eyebrow: string; title: string; c
 }
 
 export function ExplorePage() {
-  return <PageFrame><section className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><PageIntro eyebrow="Made for journeys across India" title="Explore India" copy="Find the places, stays and local travel that make your next trip yours."/><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{destinations.map((item) => <a key={item.id} href={`/destination/${item.id}`} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"><div className="aspect-[4/3] overflow-hidden"><img src={item.image} alt={`${item.name}, ${item.state}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"/></div><div className="p-5"><p className="text-xs font-bold uppercase text-primary">{item.state}</p><h2 className="mt-1 font-display text-2xl font-semibold">{item.name}</h2><p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{item.description}</p><div className="mt-4 flex flex-wrap gap-2"><span className="tag"><BedDouble/>{item.stays}</span><span className="tag"><CarFront/>{item.cabs}</span></div><span className="mt-4 flex items-center justify-between text-sm font-semibold text-primary">Explore {item.name}<ArrowRight className="size-4"/></span></div></a>)}</div></div></section></PageFrame>;
+  return <PageFrame><section className="section-pad"><div className="mx-auto max-w-7xl px-5 md:px-8"><PageIntro eyebrow="Made for journeys across India" title="Explore India" copy="Find the places, stays and local travel that make your next trip yours."/><div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{destinations.map((item) => <a key={item.id} href={`/destination/${item.id}`} className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"><div className="aspect-[4/3] w-full overflow-hidden"><img src={item.image} alt={`${item.name}, ${item.state}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"/></div><div className="flex flex-1 flex-col p-5"><p className="text-xs font-bold uppercase text-primary">{item.state}</p><h2 className="mt-1 font-display text-2xl font-semibold">{item.name}</h2><p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">{item.description}</p><div className="mt-4 flex flex-wrap gap-2"><span className="tag"><BedDouble/>{item.stays}</span><span className="tag"><CarFront/>{item.cabs}</span></div><span className="mt-auto flex items-center justify-between pt-4 text-sm font-semibold text-primary">Explore {item.name}<ArrowRight className="size-4"/></span></div></a>)}</div></div></section></PageFrame>;
 }
 
 export function StaysPage() {
@@ -24,14 +24,14 @@ export function StaysPage() {
       <section className="section-pad bg-secondary">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <PageIntro eyebrow="Accommodation" title="Stays across India" copy="Browse every stay currently listed in Treko. Details and prices are prototype information." />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {stays.map((item) => (
-              <article key={item.name} className="overflow-hidden rounded-2xl bg-card shadow-card">
+              <article key={item.name} className="flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-card">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <ImageCarousel images={item.images} label={item.name} className="absolute inset-0" />
                   <span className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1.5 text-xs font-bold">{item.type}</span>
                 </div>
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="font-display text-xl font-semibold">{item.name}</h2>
@@ -40,9 +40,9 @@ export function StaysPage() {
                     <span className="flex items-center gap-1 text-sm font-bold"><Star className="size-4 fill-primary text-primary" />{item.rating}</span>
                   </div>
                   <div className="my-4 flex flex-wrap gap-2">{item.amenities.map((amenity) => <span className="tag" key={amenity}><Check />{amenity}</span>)}</div>
-                  <div className="flex items-center justify-between border-t border-border pt-4">
-                    <p><span className="font-display text-xl font-bold">{item.priceLabel ?? item.price}</span></p>
-                    <a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Hotel</a>
+                  <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
+                    <p className="min-w-0"><span className="font-display text-xl font-bold">{item.priceLabel ?? item.price}</span></p>
+                    <a href={createListingUrl(item.destinationId, item.slug)} className="shrink-0 text-sm font-semibold text-primary">View Hotel</a>
                   </div>
                 </div>
               </article>
@@ -60,9 +60,9 @@ export function CabOperatorsPage() {
     <section className="section-pad">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <PageIntro eyebrow="Local travel" title="Cab operators" copy="Explore all operator listings currently available in Treko and the areas they serve." />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {operators.map((item) => (
-            <article key={item.name} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <article key={item.name} className="flex h-full flex-col rounded-2xl border border-border bg-card p-4 shadow-card sm:p-5 lg:p-6">
               <ImageCarousel images={item.images} label={item.name} className="mb-5 aspect-[16/9] rounded-xl" />
               <div className="flex items-start justify-between">
                 <span className="grid size-12 place-items-center rounded-xl bg-accent font-display font-bold text-primary">{item.initials}</span>
@@ -76,9 +76,9 @@ export function CabOperatorsPage() {
                   {item.services.length > 2 ? " etc." : ""}
                 </p>
               </div>
-              <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
-                <p className="text-sm font-bold text-primary">{item.price}</p>
-                <a href={createListingUrl(item.destinationId, item.slug)} className="text-sm font-semibold text-primary">View Cab</a>
+              <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-5">
+                <p className="text-sm font-bold text-primary">{item.pricing}</p>
+                <a href={createListingUrl(item.destinationId, item.slug)} className="shrink-0 text-sm font-semibold text-primary">View Cab</a>
               </div>
             </article>
           ))}

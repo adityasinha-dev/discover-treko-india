@@ -307,9 +307,10 @@ function Destinations() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {destinations.map((item) => (
-            <article
+            <a
               key={item.name}
-              className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+              href={`/destination/${item.id}`}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
             >
               <div className="aspect-[4/3] overflow-hidden">
                 <img
@@ -322,7 +323,7 @@ function Destinations() {
                 />
               </div>
 
-              <div className="p-5">
+              <div className="flex flex-1 flex-col p-5">
                 <p className="text-xs font-bold uppercase text-primary">{item.state}</p>
                 <h3 className="mt-1 font-display text-2xl font-semibold">{item.name}</h3>
                 <p className="mt-2 min-h-12 text-sm leading-6 text-muted-foreground">
@@ -338,18 +339,12 @@ function Destinations() {
                     {item.cabs}
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="mt-4 w-full justify-between px-0 hover:bg-transparent hover:text-primary"
-                >
-                  <a href="/stays">
-                    Explore {item.name}
-                    <ArrowRight />
-                  </a>
-                </Button>
+                <span className="mt-4 flex w-full items-center justify-between px-0 text-sm font-semibold text-primary">
+                  Explore {item.name}
+                  <ArrowRight className="size-4" />
+                </span>
               </div>
-            </article>
+            </a>
           ))}
         </div>
       </div>

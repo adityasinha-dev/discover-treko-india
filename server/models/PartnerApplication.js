@@ -1,5 +1,21 @@
 import mongoose from "mongoose";
 
+const vehicleOptionSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    seatingCapacity: { type: String, required: true, trim: true },
+    images: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (images) => images.length <= 4,
+        message: "A vehicle can have at most 4 photos.",
+      },
+    },
+  },
+  { _id: false },
+);
+
 const listingSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -10,6 +26,7 @@ const listingSchema = new mongoose.Schema(
     },
     destination: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
+    vehicleOptions: { type: [vehicleOptionSchema], default: [] },
   },
   { timestamps: true },
 );

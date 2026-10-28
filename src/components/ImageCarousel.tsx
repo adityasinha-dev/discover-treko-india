@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -19,6 +19,8 @@ export function ImageCarousel({
 }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const pointerStartX = useRef<number | null>(null);
+  const suppressClick = useRef(false);
   const imageCount = images.length;
 
   useEffect(() => {
@@ -39,6 +41,22 @@ export function ImageCarousel({
 
   const move = (direction: -1 | 1) => {
     setActiveIndex((current) => (current + direction + imageCount) % imageCount);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (imageCount < 2 || event.button !== 0) return;
+    pointerStartX.current = event.clientX;
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (pointerStartX.current === null) return;
+
+    const swipeDistance = event.clientX - pointerStartX.current;
+    pointerStartX.current = null;
+    if (Math.abs(swipeDistance) < 40) return;
+
+    move(swipeDistance > 0 ? -1 : 1);
+    suppressClick.current = true;
   };
 
   const renderImages = (large = false) => (
@@ -117,6 +135,18 @@ export function ImageCarousel({
         role="region"
         aria-roledescription="carousel"
         aria-label={`${label} photos`}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => {
+          pointerStartX.current = null;
+        }}
+        onClickCapture={(event) => {
+          if (!suppressClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          suppressClick.current = false;
+        }}
+        style={{ touchAction: "pan-y" }}
       >
         {renderImages()}
         {renderControls()}

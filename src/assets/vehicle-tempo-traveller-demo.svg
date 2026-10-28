@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="50" y1="0" x2="1120" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6F0E7"/>
+      <stop offset="1" stop-color="#D0E2EC"/>
+    </linearGradient>
+    <linearGradient id="car" x1="220" y1="225" x2="1000" y2="555" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F0E2"/>
+      <stop offset="1" stop-color="#C9D7CB"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1200v700H0z"/>
+  <circle cx="929" cy="132" r="63" fill="#F5D38C"/>
+  <path fill="#A4C1B7" d="m0 427 178-191 175 154 191-231 194 253 178-151 284 176v163H0z"/>
+  <path fill="#D9E5D7" d="m0 493 205-109 194 135 207-116 195 125 198-136 201 88v220H0z"/>
+  <path fill="#778980" d="M0 568h1200v132H0z"/>
+  <path stroke="#E8DFAE" stroke-dasharray="28 27" stroke-linecap="round" stroke-width="8" d="M0 650h1200"/>
+  <ellipse cx="615" cy="557" fill="#213834" fill-opacity=".22" rx="389" ry="37"/>
+  <path fill="url(#car)" d="M247 236h586c40 0 74 12 104 39l120 108c24 21 37 50 37 82v48c0 27-21 48-48 48H247c-27 0-48-21-48-48V284c0-27 21-48 48-48Z"/>
+  <path fill="#759F9D" d="M281 274h133v120H281z"/>
+  <path fill="#759F9D" d="M431 274h133v120H431z"/>
+  <path fill="#759F9D" d="M581 274h133v120H581z"/>
+  <path fill="#759F9D" d="M731 274h91c24 0 43 7 61 23l103 97H731V274Z"/>
+  <path stroke="#D2DCCF" stroke-width="8" d="M420 274v126m150-126v126m150-126v126"/>
+  <path fill="#F2D79A" d="M211 416h49v66h-49z"/>
+  <path fill="#ECF0E5" d="M1049 415h36c14 0 25 11 25 25v48h-61v-73Z"/>
+  <circle cx="393" cy="503" r="73" fill="#263B39"/>
+  <circle cx="393" cy="503" r="37" fill="#D9E3D8"/>
+  <circle cx="393" cy="503" r="16" fill="#80958A"/>
+  <circle cx="846" cy="503" r="73" fill="#263B39"/>
+  <circle cx="846" cy="503" r="37" fill="#D9E3D8"/>
+  <circle cx="846" cy="503" r="16" fill="#80958A"/>
+  <path fill="#B7C9BB" d="M484 424h54v29h-54zm151 0h54v29h-54z"/>
+  <path stroke="#A5BBAE" stroke-linecap="round" stroke-width="8" d="M280 407h542"/>
+</svg>

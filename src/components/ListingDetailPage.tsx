@@ -8,6 +8,7 @@ import { Navbar } from "@/components/TrekoLanding";
 import { ImageCarousel } from "@/components/ImageCarousel";
 import { buildHotelRoomOptions, getDestinationBySlug, getListingBySlug } from "@/data/treko";
 import { upsertTripSelection, type TripItem } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -27,7 +28,7 @@ function getNights(start: string, end: string) {
   return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) || 1);
 }
 
-function getSuitableRooms(rooms: { maxGuests: number }[], guestCount: number) {
+function getSuitableRooms<T extends { maxGuests: number }>(rooms: T[], guestCount: number): T[] {
   if (guestCount <= 2) return rooms.filter((room) => room.maxGuests <= 2);
   if (guestCount <= 4) return rooms.filter((room) => room.maxGuests <= 4);
   return rooms.filter((room) => room.maxGuests >= 4);
@@ -57,7 +58,7 @@ function ListingHero({
         <a href={backHref} className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
           <ArrowLeft className="size-4" /> {backLabel}
         </a>
-        <div className="mt-8 grid items-center gap-8 md:grid-cols-[1.1fr_0.9fr]">
+        <div className={`mt-8 grid items-center gap-8 ${images.length ? "md:grid-cols-[1.1fr_0.9fr]" : ""}`}>
           <div>
             <p className="section-label">{destination}</p>
             <h1 className="mt-3 font-display text-4xl font-semibold md:text-6xl">{title}</h1>
@@ -90,6 +91,9 @@ export function ListingDetailPage() {
     selectedRoomId: "",
   });
   const [expandedImageIndex, setExpandedImageIndex] = useState<number | null>(null);
+  const [guidePortraitOpen, setGuidePortraitOpen] = useState(false);
+  const [partnerVehicleImages, setPartnerVehicleImages] = useState<Record<string, string[]>>({});
+  const [partnerVehicleImageError, setPartnerVehicleImageError] = useState("");
   const [cabForm, setCabForm] = useState({
     travelDate: "2026-10-15",
     pickup: "Railway Station",
@@ -105,10 +109,53 @@ export function ListingDetailPage() {
     startPoint: "Mahakaleshwar Temple",
     duration: "2 days",
   });
+  const cabName = listing?.kind === "cab" ? listing.data.name : null;
+  const cabDestination = listing?.kind === "cab" ? listing.data.destination : null;
+
+  useEffect(() => {
+    if (!cabName || !cabDestination) {
+      setPartnerVehicleImages({});
+      setPartnerVehicleImageError("");
+      return;
+    }
+
+    let active = true;
+    setPartnerVehicleImages({});
+    setPartnerVehicleImageError("");
+    const query = new URLSearchParams({
+      name: cabName,
+      destination: cabDestination,
+    });
+    void apiRequest<{ vehicleOptions: Array<{ name: string; images: string[] }> }>(
+      `/api/business/vehicles?${query.toString()}`,
+    )
+      .then((result) => {
+        if (!active) return;
+        setPartnerVehicleImages(
+          Object.fromEntries(
+            result.vehicleOptions
+              .filter((vehicle) => vehicle.images.length > 0)
+              .map((vehicle) => [vehicle.name, vehicle.images]),
+          ),
+        );
+      })
+      .catch((loadError) => {
+        if (!active) return;
+        setPartnerVehicleImageError(
+          loadError instanceof Error
+            ? `Partner vehicle photos could not be loaded: ${loadError.message}`
+            : "Partner vehicle photos could not be loaded.",
+        );
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [cabName, cabDestination]);
   const totalHotelGuests = Number(hotelForm.adults || 1) + Number(hotelForm.children || 0);
   const hotelRoomOptions =
     listing?.kind === "stay"
-      ? listing.data.roomOptions ?? buildHotelRoomOptions(listing.data.price, listing.data.image)
+      ? listing.data.roomOptions ?? buildHotelRoomOptions(listing.data.price, listing.data.images)
       : [];
   const suitableHotelRooms = getSuitableRooms(hotelRoomOptions, totalHotelGuests);
   const selectedHotelRoom =
@@ -148,7 +195,7 @@ export function ListingDetailPage() {
   const bookStay = () => {
     if (listing.kind !== "stay") return;
     const detail = listing.data;
-    const roomOptions = detail.roomOptions ?? buildHotelRoomOptions(detail.price, detail.image);
+    const roomOptions = detail.roomOptions ?? buildHotelRoomOptions(detail.price, detail.images);
     const totalGuests = Number(hotelForm.adults || 0) + Number(hotelForm.children || 0);
     const suitableRooms = getSuitableRooms(roomOptions, totalGuests);
     const selectedRoom = suitableRooms.find((room) => room.id === hotelForm.selectedRoomId) ?? suitableRooms[0] ?? roomOptions[0];
@@ -163,7 +210,7 @@ export function ListingDetailPage() {
       type: "stay",
       category: "Hotel",
       name: detail.name,
-      image: detail.image,
+      image: selectedRoom.image,
       location: detail.location,
       packageName: selectedRoom.name,
       price: roomTotal,
@@ -254,7 +301,9 @@ export function ListingDetailPage() {
 
   if (listing.kind === "stay") {
     const detail = listing.data;
-    const hotelImages = [...new Set([detail.image, ...detail.images])];
+    const hotelImages = [
+      ...new Set([detail.image, ...detail.images, ...hotelRoomOptions.flatMap((room) => room.images)]),
+    ];
     const expandedHotelImage = expandedImageIndex === null ? null : hotelImages[expandedImageIndex] ?? null;
     const totalGuests = totalHotelGuests;
     const suitableRooms = suitableHotelRooms;
@@ -278,7 +327,7 @@ export function ListingDetailPage() {
           <span className="tag"><Star className="size-3 fill-primary text-primary" />{detail.rating}</span>
           <span className="tag"><MapPin className="size-3" />{detail.location}</span>
         </ListingHero>
-        <section className="section-pad"><div className="mx-auto grid max-w-7xl gap-8 px-5 md:grid-cols-[1.2fr_0.8fr] md:px-8"><div className="space-y-8"><div><h2 className="font-display text-3xl font-semibold">Hotel Information</h2><div className="mt-5 grid gap-4 md:grid-cols-2">{detail.images.map((image, index) => { const alt = `${detail.name} gallery ${index + 1}`; return <button key={`${detail.id}-${index}`} type="button" onClick={() => showHotelImage(image)} aria-label={`View larger image: ${alt}`} className="cursor-zoom-in overflow-hidden rounded-2xl text-left"><img src={image} alt={alt} className="h-56 w-full object-cover transition-transform duration-300 hover:scale-[1.03]" /></button>; })}</div><div className="mt-6 grid gap-6 md:grid-cols-2"><div className="rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Availability</p><p className="mt-2 font-semibold">{detail.availability}</p></div><div className="rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Price</p><p className="mt-2 font-semibold text-primary">{formatCurrency(detail.price)} / night</p></div></div><div className="mt-6 rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Amenities</p><div className="mt-4 flex flex-wrap gap-2">{detail.amenities.map((item) => <span key={item} className="tag"><Check className="size-3" />{item}</span>)}</div></div></div>
+        <section className="section-pad"><div className="mx-auto grid max-w-7xl gap-8 px-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)] md:px-8"><div className="space-y-8"><div><h2 className="font-display text-3xl font-semibold">Hotel Information</h2><div className="mt-5 grid gap-4 sm:grid-cols-2">{detail.images.map((image, index) => { const alt = `${detail.name} gallery ${index + 1}`; return <button key={`${detail.id}-${index}`} type="button" onClick={() => showHotelImage(image)} aria-label={`View larger image: ${alt}`} className="cursor-zoom-in overflow-hidden rounded-2xl text-left"><img src={image} alt={alt} className="h-56 w-full object-cover transition-transform duration-300 hover:scale-[1.03]" /></button>; })}</div><div className="mt-6 grid gap-6 sm:grid-cols-2"><div className="rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Availability</p><p className="mt-2 font-semibold">{detail.availability}</p></div><div className="rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Price</p><p className="mt-2 font-semibold text-primary">{formatCurrency(detail.price)} / night</p></div></div><div className="mt-6 rounded-2xl bg-secondary p-5"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Amenities</p><div className="mt-4 flex flex-wrap gap-2">{detail.amenities.map((item) => <span key={item} className="tag"><Check className="size-3" />{item}</span>)}</div></div></div>
           <div className="rounded-3xl border border-border bg-card p-6 shadow-card">
             <p className="section-label">Travel details</p>
             <h3 className="mt-2 font-display text-2xl font-semibold">Who is travelling?</h3>
@@ -342,10 +391,14 @@ export function ListingDetailPage() {
                   const isSelected = selectedRoom?.id === room.id;
                   return (
                     <article key={room.id} className={`overflow-hidden rounded-3xl border bg-card transition-colors ${isSelected ? "border-primary shadow-card ring-2 ring-primary/20" : "border-border"}`}>
-                      <div className="grid gap-0 md:grid-cols-[0.9fr_1.1fr]">
-                        <button type="button" onClick={() => showHotelImage(room.image)} aria-label={`View larger image of ${room.name}`} className="cursor-zoom-in overflow-hidden text-left">
-                          <img src={room.image} alt={`${detail.name} ${room.name}`} className="h-56 w-full object-cover transition-transform duration-300 hover:scale-[1.03] md:h-full md:min-h-[200px]" />
-                        </button>
+                      <div className="grid min-w-0 gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                        <ImageCarousel
+                          key={room.id}
+                          images={room.images.length ? room.images : [room.image]}
+                          label={`${detail.name} ${room.name}`}
+                          className="aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[240px]"
+                          autoPlayMs={5000}
+                        />
                         <div className="p-5">
                           <div className="flex items-start justify-between gap-3">
                             <div>
@@ -455,13 +508,126 @@ export function ListingDetailPage() {
   if (listing.kind === "cab") {
     const detail = listing.data;
     const cabImages = [...new Set([detail.image, ...detail.images])];
+    const vehicleOptions = detail.vehicleOptions.map((vehicle) => {
+      const uploadedImages = partnerVehicleImages[vehicle.name] ?? [];
+      return {
+        ...vehicle,
+        images: uploadedImages.length ? uploadedImages : vehicle.images,
+      };
+    });
     return (
       <main className="min-h-screen bg-background">
         <ListingHero title={detail.name} destination={detail.destination} description={detail.description} images={cabImages} backHref="/cab-operators" backLabel="Back to operators">
           <span className="tag"><Star className="size-3 fill-primary text-primary" />{detail.rating}</span>
           <span className="tag"><MapPin className="size-3" />{detail.destination}</span>
         </ListingHero>
-        <section className="section-pad"><div className="mx-auto grid max-w-7xl gap-8 px-5 md:grid-cols-[1.2fr_0.8fr] md:px-8"><div className="space-y-8"><div className="rounded-2xl bg-secondary p-6"><h2 className="font-display text-3xl font-semibold">Cab Information</h2><div className="mt-6 grid gap-4 md:grid-cols-2"><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Vehicle types</p><ul className="mt-2 space-y-2 text-sm text-muted-foreground">{detail.vehicleTypes.map((vehicle) => <li key={vehicle}>• {vehicle}</li>)}</ul></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Pricing</p><p className="mt-2 font-semibold text-primary">{detail.pricing}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Services</p><ul className="mt-2 space-y-2 text-sm text-muted-foreground">{detail.services.map((service) => <li key={service}>• {service}</li>)}</ul></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Pickup / Drop</p><p className="mt-2 text-sm text-muted-foreground">{detail.pickupInfo} → {detail.dropInfo}</p></div></div></div><div className="rounded-2xl border border-border bg-card p-6 shadow-card"><h3 className="font-display text-2xl font-semibold">Cab Terms & Conditions</h3><ul className="mt-4 space-y-3 text-sm text-muted-foreground">{detail.terms.map((term) => <li key={term} className="flex gap-3"><ShieldCheck className="mt-0.5 size-4 text-primary" />{term}</li>)}</ul></div></div>
+        <section className="section-pad">
+          <div className="mx-auto grid max-w-7xl gap-8 px-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)] md:px-8">
+            <div className="space-y-8">
+              <div>
+                <div className="mb-5">
+                  <p className="section-label">Choose your ride</p>
+                  <h2 className="mt-2 font-display text-3xl font-semibold">Available vehicles</h2>
+                  <p className="mt-2 text-muted-foreground">
+                    Compare the vehicles offered by {detail.name} and select one for your trip.
+                  </p>
+                </div>
+                {partnerVehicleImageError ? (
+                  <p role="alert" className="mb-4 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
+                    {partnerVehicleImageError}
+                  </p>
+                ) : null}
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  {vehicleOptions.map((vehicle) => {
+                    const isSelected = cabForm.vehicle === vehicle.name;
+                    return (
+                      <article
+                        key={vehicle.name}
+                        className={`flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition-colors ${
+                          isSelected
+                            ? "border-primary shadow-card ring-2 ring-primary/20"
+                            : "border-border"
+                        }`}
+                      >
+                        {vehicle.images.length ? (
+                          <div className="aspect-[16/10]">
+                            <ImageCarousel
+                              images={vehicle.images}
+                              label={`${detail.name} ${vehicle.name}`}
+                              className="h-full"
+                              autoPlayMs={0}
+                            />
+                          </div>
+                        ) : (
+                          <div className="grid aspect-[16/10] place-items-center bg-secondary text-sm text-muted-foreground">
+                            Vehicle images coming soon
+                          </div>
+                        )}
+                        <div className="flex flex-1 flex-col p-5">
+                          <p className="section-label">Vehicle option</p>
+                          <h3 className="mt-1 font-display text-2xl font-semibold">{vehicle.name}</h3>
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            {vehicle.seatingCapacity}
+                          </p>
+                          <p className="mt-4 font-semibold text-primary">
+                            From {formatCurrency(detail.price)} / day
+                          </p>
+                          <Button
+                            type="button"
+                            aria-pressed={isSelected}
+                            variant={isSelected ? "secondary" : "default"}
+                            onClick={() =>
+                              setCabForm((current) => ({ ...current, vehicle: vehicle.name }))
+                            }
+                            className="mt-auto w-full rounded-full"
+                          >
+                            {isSelected ? "Selected vehicle" : "Choose this vehicle"}
+                          </Button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="rounded-2xl bg-secondary p-6">
+                <h2 className="font-display text-3xl font-semibold">Cab Information</h2>
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Vehicle types</p>
+                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                      {detail.vehicleTypes.map((vehicle) => <li key={vehicle}>• {vehicle}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Pricing</p>
+                    <p className="mt-2 font-semibold text-primary">{detail.pricing}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Services</p>
+                    <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                      {detail.services.map((service) => <li key={service}>• {service}</li>)}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Pickup / Drop</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {detail.pickupInfo} → {detail.dropInfo}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+                <h3 className="font-display text-2xl font-semibold">Cab Terms & Conditions</h3>
+                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                  {detail.terms.map((term) => (
+                    <li key={term} className="flex gap-3">
+                      <ShieldCheck className="mt-0.5 size-4 text-primary" />
+                      {term}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           <aside className="rounded-3xl border border-border bg-card p-6 shadow-card">
             <p className="section-label">Booking</p>
             <h3 className="mt-2 font-display text-3xl font-semibold">Book Cab</h3>
@@ -469,25 +635,44 @@ export function ListingDetailPage() {
               <label className="block"><span className="mb-2 block font-semibold">Travel date</span><Input type="date" value={cabForm.travelDate} onChange={(event) => setCabForm((current) => ({ ...current, travelDate: event.target.value }))} /></label>
               <div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="mb-2 block font-semibold">Pickup</span><Input value={cabForm.pickup} onChange={(event) => setCabForm((current) => ({ ...current, pickup: event.target.value }))} /></label><label className="block"><span className="mb-2 block font-semibold">Drop</span><Input value={cabForm.drop} onChange={(event) => setCabForm((current) => ({ ...current, drop: event.target.value }))} /></label></div>
               <div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="mb-2 block font-semibold">Pickup time</span><Input type="time" value={cabForm.pickupTime} onChange={(event) => setCabForm((current) => ({ ...current, pickupTime: event.target.value }))} /></label><label className="block"><span className="mb-2 block font-semibold">Passengers</span><Input value={cabForm.passengers} onChange={(event) => setCabForm((current) => ({ ...current, passengers: event.target.value }))} /></label></div>
-              <label className="block"><span className="mb-2 block font-semibold">Vehicle / package</span><select value={cabForm.vehicle} onChange={(event) => setCabForm((current) => ({ ...current, vehicle: event.target.value }))} className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal"><option value="Sedan">Sedan</option><option value="SUV">SUV</option><option value="Tempo Traveller">Tempo Traveller</option></select></label>
+              <label className="block">
+                <span className="mb-2 block font-semibold">Vehicle / package</span>
+                <select
+                  value={cabForm.vehicle}
+                  onChange={(event) =>
+                    setCabForm((current) => ({ ...current, vehicle: event.target.value }))
+                  }
+                  className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 font-normal"
+                >
+                  {detail.vehicleOptions.map((vehicle) => (
+                    <option key={vehicle.name} value={vehicle.name}>{vehicle.name}</option>
+                  ))}
+                </select>
+              </label>
             </div>
             <div className="mt-6 rounded-2xl bg-secondary p-4"><p className="text-sm text-muted-foreground">Estimated demo price</p><p className="mt-2 font-display text-3xl font-semibold text-primary">{formatCurrency(cabTotal)}</p><p className="mt-2 text-xs text-muted-foreground">{cabForm.vehicle} • {cabForm.passengers} passengers</p></div>
             <Button onClick={bookCab} className="mt-6 h-12 w-full rounded-full">Book Cab</Button>
           </aside>
         </div></section>
+        <Dialog open={guidePortraitOpen} onOpenChange={setGuidePortraitOpen}>
+          <DialogContent className="w-[calc(100vw-1.5rem)] max-w-3xl border-0 bg-black/95 p-3 text-white shadow-2xl sm:rounded-2xl md:p-5">
+            <DialogTitle className="sr-only">{detail.name} profile image</DialogTitle>
+            <img src={detail.image} alt={`${detail.name} profile`} className="max-h-[82vh] w-full rounded-xl object-contain" />
+          </DialogContent>
+        </Dialog>
       </main>
     );
   }
 
   const detail = listing.data;
-  const guideImages = [...new Set([detail.image, ...(destinationInfo.images ?? [])])];
+  const guideImages = detail.images;
   return (
     <main className="min-h-screen bg-background">
       <ListingHero title={detail.name} destination={detail.destination} description={detail.description} images={guideImages} backHref="/explore" backLabel="Back to Explore">
         <span className="tag"><Star className="size-3 fill-primary text-primary" />{detail.rating}</span>
         <span className="tag"><Languages className="size-3" />{detail.languages.join(" • ")}</span>
       </ListingHero>
-      <section className="section-pad"><div className="mx-auto grid max-w-7xl gap-8 px-5 md:grid-cols-[1.2fr_0.8fr] md:px-8"><div className="space-y-8"><div className="rounded-2xl bg-secondary p-6"><h2 className="font-display text-3xl font-semibold">Guide Profile</h2><div className="mt-6 grid gap-4 md:grid-cols-2"><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Languages</p><p className="mt-2 text-sm text-muted-foreground">{detail.languages.join(" • ")}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Experience</p><p className="mt-2 text-sm text-muted-foreground">{detail.experience}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Specialization</p><p className="mt-2 text-sm text-muted-foreground">{detail.specialization}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Price</p><p className="mt-2 font-semibold text-primary">{detail.priceLabel}</p></div></div></div><div className="rounded-2xl border border-border bg-card p-6 shadow-card"><h3 className="font-display text-2xl font-semibold">Your Guide Package Covers</h3>{guidePackage ? <div className="mt-5"><p className="font-semibold text-primary">{guidePackage.name}</p><div className="mt-4 grid gap-4 md:grid-cols-2">{guidePackage.itinerary.map((day) => <div key={day.day} className="rounded-xl bg-secondary p-4"><p className="font-semibold text-foreground">{day.day}</p><ul className="mt-3 space-y-2 text-sm text-muted-foreground">{day.stops.map((stop) => <li key={stop}>• {stop}</li>)}</ul></div>)}</div></div> : null}<div className="mt-6"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Destinations Covered</p><div className="mt-3 flex flex-wrap gap-2">{detail.destinationsCovered.map((location) => <span key={location} className="tag"><Compass className="size-3" />{location}</span>)}</div></div></div><div className="rounded-2xl border border-border bg-card p-6 shadow-card"><h3 className="font-display text-2xl font-semibold">Terms & Conditions</h3><ul className="mt-4 space-y-3 text-sm text-muted-foreground">{detail.terms.map((term) => <li key={term} className="flex gap-3"><ShieldCheck className="mt-0.5 size-4 text-primary" />{term}</li>)}</ul></div></div>
+      <section className="section-pad"><div className="mx-auto grid max-w-7xl gap-8 px-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)] md:px-8"><div className="space-y-8"><div className="rounded-2xl bg-secondary p-6"><h2 className="font-display text-3xl font-semibold">Guide Profile</h2><div className="mt-5 flex items-center gap-4"><button type="button" onClick={() => setGuidePortraitOpen(true)} aria-label={`View larger ${detail.name} profile image`} className="shrink-0 cursor-zoom-in rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"><img src={detail.image} alt={`${detail.name} profile`} className="size-20 rounded-full object-cover ring-2 ring-accent" /></button><p className="font-display text-xl font-semibold">{detail.name}</p></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Languages</p><p className="mt-2 text-sm text-muted-foreground">{detail.languages.join(" • ")}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Experience</p><p className="mt-2 text-sm text-muted-foreground">{detail.experience}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Specialization</p><p className="mt-2 text-sm text-muted-foreground">{detail.specialization}</p></div><div><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Price</p><p className="mt-2 font-semibold text-primary">{detail.priceLabel}</p></div></div></div><div className="rounded-2xl border border-border bg-card p-6 shadow-card"><h3 className="font-display text-2xl font-semibold">Your Guide Package Covers</h3>{guidePackage ? <div className="mt-5"><p className="font-semibold text-primary">{guidePackage.name}</p><div className="mt-4 grid gap-4 sm:grid-cols-2">{guidePackage.itinerary.map((day) => <div key={day.day} className="rounded-xl bg-secondary p-4"><p className="font-semibold text-foreground">{day.day}</p><ul className="mt-3 space-y-2 text-sm text-muted-foreground">{day.stops.map((stop) => <li key={stop}>• {stop}</li>)}</ul></div>)}</div></div> : null}<div className="mt-6"><p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Destinations Covered</p><div className="mt-3 flex flex-wrap gap-2">{detail.destinationsCovered.map((location) => <span key={location} className="tag"><Compass className="size-3" />{location}</span>)}</div></div></div><div className="rounded-2xl border border-border bg-card p-6 shadow-card"><h3 className="font-display text-2xl font-semibold">Terms & Conditions</h3><ul className="mt-4 space-y-3 text-sm text-muted-foreground">{detail.terms.map((term) => <li key={term} className="flex gap-3"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />{term}</li>)}</ul></div></div>
         <aside className="rounded-3xl border border-border bg-card p-6 shadow-card">
           <p className="section-label">Booking</p>
           <h3 className="mt-2 font-display text-3xl font-semibold">Book Guide</h3>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BadgeCheck,
@@ -7,15 +7,17 @@ import {
   Clock3,
   Eye,
   EyeOff,
+  ImagePlus,
   LoaderCircle,
   LogOut,
   RefreshCw,
   ShieldCheck,
+  Trash2,
   XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/TrekoLanding";
-import { destinations } from "@/data/treko";
+import { buildCabVehicleOptions, destinations } from "@/data/treko";
 import { ApiRequestError, apiRequest } from "@/lib/api";
 import {
   clearAdminAuthToken,
@@ -35,6 +37,11 @@ type PartnerListing = {
   destination: string;
   description: string;
   createdAt: string;
+  vehicleOptions: Array<{
+    name: string;
+    seatingCapacity: string;
+    images: string[];
+  }>;
 };
 
 type PartnerApplication = {
@@ -70,6 +77,50 @@ type DashboardData = {
 };
 
 const panelClass = "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8";
+const maxVehicleImageCount = 4;
+const maxVehicleImageBytes = 512 * 1024;
+
+async function prepareVehicleImage(file: File): Promise<string> {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw new Error("Choose a JPEG, PNG, or WebP image.");
+  }
+
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (!context) {
+    bitmap.close();
+    throw new Error("Your browser could not prepare this image.");
+  }
+
+  let scale = Math.min(1, 1400 / Math.max(bitmap.width, bitmap.height));
+  let imageBlob: Blob | null = null;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    imageBlob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", Math.max(0.55, 0.84 - attempt * 0.05)),
+    );
+    if (imageBlob && imageBlob.size <= maxVehicleImageBytes) break;
+    scale *= 0.8;
+  }
+  bitmap.close();
+
+  if (!imageBlob || imageBlob.size > maxVehicleImageBytes) {
+    throw new Error("This photo could not be compressed below 512 KB. Choose a smaller image.");
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("Unable to read the selected photo."));
+    };
+    reader.onerror = () => reject(new Error("Unable to read the selected photo."));
+    reader.readAsDataURL(imageBlob);
+  });
+}
 
 function adminApiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getAdminAuthToken();
@@ -319,6 +370,8 @@ export function BusinessDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  const [savingVehicleKey, setSavingVehicleKey] = useState("");
+  const [vehiclePhotoErrors, setVehiclePhotoErrors] = useState<Record<string, string>>({});
 
   const loadStatus = useCallback(
     async (isRefresh = false) => {
@@ -357,6 +410,82 @@ export function BusinessDashboardPage() {
     }
     void loadStatus();
   }, [loadStatus, navigate]);
+
+  const updateListingInState = (updatedListing: PartnerListing) => {
+    const updateApplication = (current: PartnerApplication | null) =>
+      current
+        ? {
+            ...current,
+            listings: current.listings.map((listing) =>
+              listing.id === updatedListing.id ? updatedListing : listing,
+            ),
+          }
+        : current;
+    setApplication(updateApplication);
+    setDashboard((current) =>
+      current
+        ? { ...current, application: updateApplication(current.application)! }
+        : current,
+    );
+  };
+
+  const saveVehicleImages = async (
+    listing: PartnerListing,
+    vehicleName: string,
+    images: string[],
+  ) => {
+    const key = `${listing.id}:${vehicleName}`;
+    setSavingVehicleKey(key);
+    setVehiclePhotoErrors((current) => ({ ...current, [key]: "" }));
+    try {
+      const result = await apiRequest<{ listing: PartnerListing }>(
+        `/api/business/listings/${listing.id}/vehicles/${encodeURIComponent(vehicleName)}/images`,
+        { method: "PUT", body: JSON.stringify({ images }) },
+      );
+      updateListingInState(result.listing);
+    } catch (saveError) {
+      setVehiclePhotoErrors((current) => ({
+        ...current,
+        [key]: saveError instanceof Error ? saveError.message : "Unable to save vehicle photos.",
+      }));
+    } finally {
+      setSavingVehicleKey("");
+    }
+  };
+
+  const handleVehicleImageUpload = async (
+    event: ChangeEvent<HTMLInputElement>,
+    listing: PartnerListing,
+    vehicle: PartnerListing["vehicleOptions"][number],
+  ) => {
+    const input = event.currentTarget;
+    const selectedFiles = Array.from(input.files ?? []);
+    input.value = "";
+    if (!selectedFiles.length) return;
+
+    const key = `${listing.id}:${vehicle.name}`;
+    const remainingSlots = maxVehicleImageCount - vehicle.images.length;
+    if (selectedFiles.length > remainingSlots) {
+      setVehiclePhotoErrors((current) => ({
+        ...current,
+        [key]: `You can add ${remainingSlots} more photo${remainingSlots === 1 ? "" : "s"} (maximum ${maxVehicleImageCount}).`,
+      }));
+      return;
+    }
+
+    setSavingVehicleKey(key);
+    setVehiclePhotoErrors((current) => ({ ...current, [key]: "" }));
+    try {
+      const newImages = await Promise.all(selectedFiles.map(prepareVehicleImage));
+      await saveVehicleImages(listing, vehicle.name, [...vehicle.images, ...newImages]);
+    } catch (uploadError) {
+      setVehiclePhotoErrors((current) => ({
+        ...current,
+        [key]: uploadError instanceof Error ? uploadError.message : "Unable to prepare the selected photos.",
+      }));
+      setSavingVehicleKey("");
+    }
+  };
 
   if (loading) {
     return (
@@ -627,12 +756,119 @@ export function BusinessDashboardPage() {
                     <p className="mt-3 text-sm leading-6 text-muted-foreground">
                       {listing.description}
                     </p>
+                    {listing.type === "Cab Operator" ? (
+                      <div className="mt-5 border-t border-border pt-5">
+                        <h4 className="font-semibold">Vehicle photos</h4>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Add up to four photos per vehicle. Photos are resized before saving.
+                        </p>
+                        <div className="mt-4 grid gap-4 md:grid-cols-2">
+                          {(listing.vehicleOptions.length
+                            ? listing.vehicleOptions
+                            : buildCabVehicleOptions(
+                                ["Sedan", "SUV", "Tempo Traveller", "Mini Van"],
+                                [
+                                  "Up to 4 passengers",
+                                  "Up to 6 passengers",
+                                  "Up to 12 passengers",
+                                  "Up to 8 passengers",
+                                ],
+                              ).map((vehicle) => ({ ...vehicle, images: [] }))
+                          ).map((vehicle) => {
+                            const key = `${listing.id}:${vehicle.name}`;
+                            const saving = savingVehicleKey === key;
+                            const photosSaving = Boolean(savingVehicleKey);
+                            const fallbackImages = buildCabVehicleOptions(
+                              [vehicle.name],
+                              [vehicle.seatingCapacity],
+                            )[0]?.images ?? [];
+                            const previewImages = vehicle.images.length
+                              ? vehicle.images
+                              : fallbackImages;
+                            return (
+                              <div key={vehicle.name} className="rounded-2xl border border-border bg-card p-4">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <h5 className="font-semibold">{vehicle.name}</h5>
+                                    <p className="text-xs text-muted-foreground">
+                                      {vehicle.seatingCapacity}
+                                    </p>
+                                  </div>
+                                  <span className="text-xs text-muted-foreground">
+                                    {vehicle.images.length}/{maxVehicleImageCount} photos
+                                  </span>
+                                </div>
+                                <div className="mt-3 grid grid-cols-2 gap-2">
+                                  {previewImages.map((image, index) => (
+                                    <div
+                                      key={`${vehicle.name}-${index}`}
+                                      className="relative aspect-[4/3] overflow-hidden rounded-xl bg-secondary"
+                                    >
+                                      <img
+                                        src={image}
+                                        alt={`${listing.name} ${vehicle.name} ${vehicle.images.length ? "uploaded" : "sample"} photo ${index + 1}`}
+                                        className="h-full w-full object-cover"
+                                      />
+                                      {vehicle.images.length ? (
+                                        <button
+                                          type="button"
+                                          aria-label={`Remove ${vehicle.name} photo ${index + 1}`}
+                                          disabled={photosSaving}
+                                          onClick={() =>
+                                            void saveVehicleImages(
+                                              listing,
+                                              vehicle.name,
+                                              vehicle.images.filter((_, photoIndex) => photoIndex !== index),
+                                            )
+                                          }
+                                          className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-black/70 text-white hover:bg-black"
+                                        >
+                                          <Trash2 className="size-4" />
+                                        </button>
+                                      ) : null}
+                                    </div>
+                                  ))}
+                                </div>
+                                <label
+                                  className={`mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-secondary ${
+                                    photosSaving || vehicle.images.length >= maxVehicleImageCount
+                                      ? "pointer-events-none opacity-50"
+                                      : ""
+                                  }`}
+                                >
+                                  {saving ? (
+                                    <LoaderCircle className="size-4 animate-spin" />
+                                  ) : (
+                                    <ImagePlus className="size-4" />
+                                  )}
+                                  {saving ? "Saving photos…" : "Add vehicle photos"}
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    multiple
+                                    disabled={photosSaving || vehicle.images.length >= maxVehicleImageCount}
+                                    onChange={(event) =>
+                                      void handleVehicleImageUpload(event, listing, vehicle)
+                                    }
+                                    className="sr-only"
+                                  />
+                                </label>
+                                {vehiclePhotoErrors[key] ? (
+                                  <p role="alert" className="mt-2 text-sm text-destructive">
+                                    {vehiclePhotoErrors[key]}
+                                  </p>
+                                ) : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
                   </article>
                 ))}
               </div>
               <p className="mt-5 text-sm text-muted-foreground">
-                For listing updates, contact Treko support and include your business name and
-                destination.
+                Other listing details can be updated by contacting Treko support.
               </p>
             </section>
           </div>

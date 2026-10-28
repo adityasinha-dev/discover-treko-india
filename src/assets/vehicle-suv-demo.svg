@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="90" y1="0" x2="1100" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DCECF1"/>
+      <stop offset="1" stop-color="#F4E5C9"/>
+    </linearGradient>
+    <linearGradient id="car" x1="280" y1="250" x2="900" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#63897C"/>
+      <stop offset="1" stop-color="#36594E"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1200v700H0z"/>
+  <circle cx="939" cy="135" r="64" fill="#F1CC82"/>
+  <path fill="#9ABCB4" d="m0 430 190-194 173 154 190-238 205 252 163-147 279 175v168H0z"/>
+  <path fill="#D6E3D6" d="m0 492 203-108 204 136 199-119 199 123 205-137 190 89v224H0z"/>
+  <path fill="#72847A" d="M0 569h1200v131H0z"/>
+  <path stroke="#E9DDA7" stroke-dasharray="28 27" stroke-linecap="round" stroke-width="8" d="M0 650h1200"/>
+  <ellipse cx="608" cy="557" fill="#203833" fill-opacity=".22" rx="375" ry="36"/>
+  <path fill="url(#car)" d="m234 456 41-100c14-33 41-53 77-59l126-22 68-108c17-27 44-42 76-42h227c32 0 58 12 80 36l89 100 105 27c31 8 51 31 53 63l5 99c1 26-20 47-47 47H270c-28 0-46-23-36-49Z"/>
+  <path fill="#86A9A2" d="m505 275 50-80c11-18 25-27 46-27h67v110H505Z"/>
+  <path fill="#86A9A2" d="M691 168h158c19 0 34 8 47 22l75 85H691V168Z"/>
+  <path stroke="#365A4F" stroke-width="9" d="M680 168v116m150-116v116"/>
+  <path fill="#F4D99D" d="M252 405h104l-19 47h-99l14-47Zm648-2h94l17 46h-89l-22-46Z"/>
+  <circle cx="408" cy="504" r="73" fill="#263B39"/>
+  <circle cx="408" cy="504" r="37" fill="#D9E3D8"/>
+  <circle cx="408" cy="504" r="16" fill="#80958A"/>
+  <circle cx="812" cy="504" r="73" fill="#263B39"/>
+  <circle cx="812" cy="504" r="37" fill="#D9E3D8"/>
+  <circle cx="812" cy="504" r="16" fill="#80958A"/>
+  <path stroke="#A8C0B1" stroke-linecap="round" stroke-width="8" d="m523 304 400 1"/>
+  <path fill="#EDC675" d="M1016 397h39c13 0 23 9 25 22l6 35h-61l-9-57Z"/>
+</svg>
