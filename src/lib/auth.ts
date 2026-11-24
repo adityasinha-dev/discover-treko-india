@@ -39,6 +39,21 @@ export type TripItem = {
   bookingMeta?: Record<string, string | number | boolean | null>;
 };
 
+export type CustomerGender =
+  | "Female"
+  | "Male"
+  | "Non-binary"
+  | "Other"
+  | "Prefer not to say";
+
+export type BookingCustomerDetails = {
+  name: string;
+  email: string;
+  phone: string;
+  gender: CustomerGender;
+  preferences: string;
+};
+
 export type BookingRecord = {
   id: string;
   userId: string;
@@ -51,7 +66,17 @@ export type BookingRecord = {
   total: number;
   couponUsed: string | null;
   bookingDate: string;
-  status: "Pending" | "Confirmed";
+  status: "Pending" | "Confirmed" | "Cancelled";
+  paymentStatus?: "Unpaid" | "Paid";
+  customerDetails?: BookingCustomerDetails;
+  businesses?: Array<{
+    businessName: string;
+    listingName: string;
+    listingType?: string;
+    phone: string;
+    email?: string;
+    address: string;
+  }>;
 };
 
 function readStorage(key: string): string | null {

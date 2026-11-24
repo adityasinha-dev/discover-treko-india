@@ -12,6 +12,38 @@ import ujjainCover_04 from "@/assets/ujjain-cover-4.jpg";
 import ujjainCover_05 from "@/assets/ujjain-cover-5.jpg";
 import ujjainCover_06 from "@/assets/ujjain-cover-6.jpeg";
 
+//Rishikesh Images
+import rishikesh_01 from "@/assets/rishikesh_01.jpg";
+import rishikesh_02 from "@/assets/rishikesh_02.jpg";
+import rishikesh_03 from "@/assets/rishikesh_03.jpg";
+import rishikesh_04 from "@/assets/rishikesh_04.jpg";
+import rishikesh_05 from "@/assets/rishikesh_05.jpg";
+
+//Shimla Images
+import shimla_01 from "@/assets/shimla_01.jpg";
+import shimla_02 from "@/assets/shimla_02.jpg";
+import shimla_03 from "@/assets/shimla_03.jpg";
+import shimla_04 from "@/assets/shimla_04.jpg";
+import shimla_05 from "@/assets/shimla_05.jpg";
+
+//Goa Images
+import goa_01 from "@/assets/goa_01.jpg";
+import goa_02 from "@/assets/goa_02.jpg";
+import goa_03 from "@/assets/goa_03.jpg";
+import goa_04 from "@/assets/goa_04.jpg";
+import goa_05 from "@/assets/goa_05.jpg";
+import goa_06 from "@/assets/goa_06.jpg";
+
+//Mumbai Images
+import mumbai_01 from "@/assets/mumbai_01.jpg";
+import mumbai_02 from "@/assets/mumbai_02.jpg";
+import mumbai_03 from "@/assets/mumbai_03.jpg";
+import mumbai_04 from "@/assets/mumbai_04.jpg";
+import mumbai_05 from "@/assets/mumbai_05.jpg";
+import mumbai_06 from "@/assets/mumbai_06.jpg";
+
+
+
 //Hotel Ujjain Pride
 import pride_image_01 from "@/assets/hotel-ujjain-pride-cover-01.jpeg";
 import pride_image_02 from "@/assets/hotel-ujjain-pride-cover-02.jpeg";
@@ -52,6 +84,22 @@ import tempoTravellerImage from "@/assets/vehicle-tempo-traveller.svg";
 import tempoTravellerDemoImage from "@/assets/vehicle-tempo-traveller-demo.svg";
 import miniVanVehicleImage from "@/assets/vehicle-mini-van.svg";
 import miniVanVehicleDemoImage from "@/assets/vehicle-mini-van-demo.svg";
+
+//Hotel JP Hills
+import jp_hills_01 from "@/assets/hotel-jp-hills-01.jpg";
+import jp_hills_02 from "@/assets/hotel-jp-hills=02.jpg";
+import jp_hills_03 from "@/assets/hotel-jp-hills-03.jpg";
+import jp_hills_04 from "@/assets/hotel-jp-hills-04.jpg";
+import jp_hills_05 from "@/assets/hotel-jp-hills-05.jpg";
+import jp_hills_06 from "@/assets/hotel-jp-hills-06.jpg";
+import jp_hills_deluxe_room_01 from "@/assets/jp-hills-deluxe-room-01.jpg";
+import jp_hills_deluxe_room_02 from "@/assets/jp-hills-deluxe-room-02.jpg";
+import jp_hills_deluxe_room_03 from "@/assets/jp-hills-deluxe-room-03.jpg";
+import jp_hills_king_room_01 from "@/assets/jp-hills-king-room-01.jpg";
+import jp_hills_king_room_02 from "@/assets/jp-hills-king-room-02.jpg";
+import jp_hills_king_room_03 from "@/assets/jp-hills-king-room-03.jpg";
+import jp_hills_king_room_04 from "@/assets/jp-hills-king-room-04.jpg";
+
 
 //Shivay taxi Services
 import shivay_suv_01 from "@/assets/shivay-suv-01.jpeg";
@@ -98,7 +146,83 @@ import hotel_atlas_13 from "@/assets/hotel-atlas-13.jpeg";
 import hotel_atlas_14 from "@/assets/hotel-atlas-14.jpeg";
 import hotel_atlas_15 from "@/assets/hotel-atlas-15.jpeg";
 
+//Yog Niketan by Sanskriti
+import yog_niketan_01 from "@/assets/yog_niketan_01.jpg";
+import yog_niketan_02 from "@/assets/yog_niketan_02.jpg";
+import yog_niketan_03 from "@/assets/yog_niketan_03.jpg";
+import yog_niketan_04 from "@/assets/yog_niketan_04.jpg";
+import yog_niketan_05 from "@/assets/yog_niketan_05.jpg";
+import yog_niketan_06 from "@/assets/yog_niketan_06.jpg";
+import yog_niketan_07 from "@/assets/yog_niketan_07.jpg";
+import yog_niketan_08 from "@/assets/yog_niketan_08.jpg";
+import yog_niketan_09 from "@/assets/yog_niketan_09.jpg";
+import yog_niketan_10 from "@/assets/yog_niketan_10.jpg";
+import yog_niketan_deluxe_room_01 from "@/assets/yog_niketan_deluxe_room_01.jpg";
+import yog_niketan_deluxe_room_02 from "@/assets/yog_niketan_deluxe_room_02.jpg";
+import yog_niketan_deluxe_room_03 from "@/assets/yog_niketan_deluxe_room_03.jpg";
+import yog_niketan_king_room_01 from "@/assets/yog_niketan_king_room_01.jpg";
+import yog_niketan_king_room_02 from "@/assets/yog_niketan_king_room_02.jpg";
+import yog_niketan_king_room_03 from "@/assets/yog_niketan_king_room_03.jpg";
+import yog_niketan_premium_room_01 from "@/assets/yog_niketan_premium_room_01.jpg";
+import yog_niketan_premium_room_02 from "@/assets/yog_niketan_premium_room_02.jpg";
+import yog_niketan_premium_room_03 from "@/assets/yog_niketan_premium_room_03.jpg";
+import yog_niketan_family_room_01 from "@/assets/yog_niketan_family_room_01.jpg";
+import yog_niketan_family_room_02 from "@/assets/yog_niketan_family_room_02.jpg";
+import yog_niketan_family_room_03 from "@/assets/yog_niketan_family_room_03.jpg";
 
+
+
+//Lemon Tree
+import lemon_tree_01 from "@/assets/lemon-tree-01.jpg";
+import lemon_tree_02 from "@/assets/lemon-tree-02.jpg";
+import lemon_tree_03 from "@/assets/lemon-tree-03.jpg";
+import lemon_tree_04 from "@/assets/lemon-tree-04.jpg";
+import lemon_tree_05 from "@/assets/lemon-tree-05.jpg";
+import lemon_tree_06 from "@/assets/lemon-tree-06.jpg";
+import lemon_tree_07 from "@/assets/lemon-tree-07.jpg";
+import lemon_tree_deluxe_room_01 from "@/assets/lemon-tree-deluxe-room-01.jpg";
+import lemon_tree_deluxe_room_02 from "@/assets/lemon-tree-deluxe-room-02.jpg";
+import lemon_tree_deluxe_room_03 from "@/assets/lemon-tree-deluxe-room-03.jpg";
+
+
+//KTS Cabs
+import kts_cab_01 from "@/assets/kts-travels-01.jpg";
+import kts_cab_02 from "@/assets/kts-travels-02.jpg";
+
+import vaibhav_singh from "@/assets/vaibhav-rishikesh-guide.jpeg";
+import kavya_rawat from "@/assets/kavya-rishikesh-guide.jpeg";
+
+//Snow Valley Heights
+import snow_valley_01 from "@/assets/snow-valley-01.jpg";
+import snow_valley_02 from "@/assets/snow-valley-02.jpg";
+import snow_valley_03 from "@/assets/snow-valley-03.jpg";
+import snow_valley_04 from "@/assets/snow-valley-04.jpg";
+import snow_valley_05 from "@/assets/snow-valley-05.jpg";
+import snow_valley_06 from "@/assets/snow-valley-06.jpg";
+import snow_valley_07 from "@/assets/snow-valley-07.jpg";
+
+//The Oberoi Ceil
+import the_oberoi_ceil_01 from "@/assets/the-oberoi-ceil-01.jpg";
+import the_oberoi_ceil_02 from "@/assets/the-oberoi-ceil-02.jpg";
+import the_oberoi_ceil_03 from "@/assets/the-oberoi-ceil.jpg";
+import the_oberoi_ceil_04 from "@/assets/the-oberoi-ceil-03.jpg";
+import the_oberoi_ceil_05 from "@/assets/the-oberoi-ceil-04.jpg";
+import the_oberoi_ceil_06 from "@/assets/the-oberoi-ceil-05.jpg";
+import the_oberoi_ceil_07 from "@/assets/the-oberoi-ceil-06.jpg";
+
+//The Hotel Valley
+import hotel_valley_01 from "@/assets/hotel-valley-01.jpg";
+import hotel_valley_02 from "@/assets/hotel-valley-02.jpg";
+import hotel_valley_03 from "@/assets/hotel-valley-03.jpg";
+import hotel_valley_04 from "@/assets/hotel-valley-04.jpg";
+import hotel_valley_05 from "@/assets/hotel-valley-05.jpg";
+
+//Mountain Drivers
+import mountain_driver_01 from "@/assets/mountain-drivers-01.jpg";
+import mountain_driver_02 from "@/assets/mountain-drivers-02.jpg";
+import mountain_driver_03 from "@/assets/mountain-drivers-03.jpg";
+import mountain_driver_04 from "@/assets/mountain-drivers-04.jpg";
+import mountain_driver_05 from "@/assets/mountain-drivers-05.jpg";
 
 
 export type Destination = {
@@ -113,11 +237,11 @@ export type Destination = {
 };
 
 export const destinations: Destination[] = [
-  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Riverside calm, yoga retreats and mountain adventures.", stays: "70+ stays", cabs: "18 cab operators", image: rishikeshImage, images: [rishikeshImage, rishikeshStay] },
+  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", description: "Explore Rishikesh, where the sacred Ganga meets the Himalayas. Experience peaceful ghats, spiritual vibes, river rafting, scenic views, and thrilling adventures in one unforgettable destination.", stays: "Explore stays", cabs: "Local Cabs",image: rishikesh_04, images: [rishikesh_04, rishikesh_02, rishikesh_03, rishikeshImage, rishikesh_01, rishikesh_05] },
   { id: "ujjain", name: "Ujjain", state: "Madhya Pradesh", description: "Experience the spiritual heart of India, home to the famous Mahakaleshwar Jyotirlinga, sacred Shipra River, ancient temples, and vibrant cultural heritage.", stays: "Explore stays", cabs: "Local cabs", image: ujjainCover_02, images: [ujjainCover_02, ujjainImage, ujjainCover_06, ujjainCover_01, ujjainCover_03, ujjainCover_04, ujjainCover_05] },
-  { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Colonial hill architecture and cedar-lined mountain views.", stays: "Explore stays", cabs: "Local cabs", image: shimlaImage, images: [shimlaImage, rishikeshImage, rishikeshStay] },
-  { id: "goa", name: "Goa", state: "Goa", description: "Coastal villages, heritage quarters and relaxed beaches.", stays: "150+ stays", cabs: "41 cab operators", image: goaImage, images: [goaImage, rishikeshImage, ujjainCover_03] },
-  { id: "mumbai", name: "Mumbai", state: "Maharashtra", description: "A vibrant coastal city of culture, food and cinema.", stays: "Explore stays", cabs: "Local cabs", image: mumbaiImage, images: [mumbaiImage, goaImage] },
+  { id: "shimla", name: "Shimla", state: "Himachal Pradesh", description: "Explore Shimla, the charming hill station nestled in the Himalayas. Enjoy breathtaking mountain views, colonial architecture, scenic valleys, pleasant weather, and unforgettable mountain escapes.", stays: "Explore stays", cabs: "Local cabs", image: shimla_01, images: [shimla_01, shimla_02, shimlaImage,shimla_03, shimla_04, shimla_05] },
+  { id: "goa", name: "Goa", state: "Goa", description: "Explore Goa, where golden beaches meet vibrant culture. Enjoy stunning sunsets, water sports, lively nightlife, scenic coastlines, and unforgettable tropical getaways.", stays: "Explore stays", cabs: "Local cabs", image: goa_01, images: [goa_01, goa_02, goa_03, goa_04,goaImage,goa_05, goa_06 ] },
+  { id: "mumbai", name: "Mumbai", state: "Maharashtra", description: "Discover Mumbai, the city of dreams, known for its iconic landmarks, bustling streets, vibrant nightlife, beautiful coastline, and endless energy.", stays: "Explore stays", cabs: "Local cabs", image: mumbai_01, images: [mumbai_01, mumbai_02, mumbai_03, mumbai_04, mumbai_05, mumbai_06] },
 ];
 
 export const indianPlaces = destinations.map((destination) =>
@@ -265,21 +389,28 @@ export const hotels = [
   },
   
   {
-    id: "ganga-vista-retreat",
-    slug: "ganga-vista-retreat",
+    id: "hotel-jp-hills",
+    slug: "hotel-jp-hills",
     destinationId: "rishikesh",
     destination: "Rishikesh",
-    name: "Ganga Vista Retreat",
+    name: "Hotel JP Hills",
     location: "Rishikesh, Uttarakhand",
-    type: "Riverside resort",
+    type: "Mountain Resort",
     rating: 4.7,
     price: 4200,
     priceLabel: "₹4,200 / night",
-    image: rishikeshStay,
-    images: [rishikeshStay, rishikeshImage],
-    roomOptions: buildHotelRoomOptions(4200, [rishikeshStay, rishikeshImage]),
+    image: jp_hills_01,
+    images: [jp_hills_01, jp_hills_02, jp_hills_03, jp_hills_04, jp_hills_05, jp_hills_06],
+    roomOptions: buildHotelRoomOptions(4100, jp_hills_02, {
+      "deluxe-double-room": [jp_hills_deluxe_room_01, jp_hills_deluxe_room_02, jp_hills_deluxe_room_03],
+      "luxury-king-room": [jp_hills_king_room_01, jp_hills_05, jp_hills_04],
+      "premium-room": [hotel_kavita_06, pride_image_14],
+      "family-room": [hotel_kavita_10, hotel_kavita_12],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [hotel_kavita_11, hotel_kavita_13],
+    }),
     description: "A peaceful riverside stay designed for early morning yoga, quiet evenings, and mountain-view breaks.",
-    amenities: ["River view", "Yoga deck", "Parking", "Breakfast", "Wi-Fi"],
+    amenities: ["Swimming Pool", "Yoga deck", "Parking", "Breakfast", "Wi-Fi"],
     availability: "Available throughout the season",
     terms: [
       "Check-in time: 1:00 PM",
@@ -363,19 +494,96 @@ export const hotels = [
     roomInfo: "Standard Room • 2 Guests • 1 Room",
   },
   {
-    id: "the-himalayan-heights",
-    slug: "the-himalayan-heights",
+    id: "snow-valley-heights",
+    slug: "snow-valley-heights",
     destinationId: "shimla",
     destination: "Shimla",
-    name: "The Himalayan Heights",
+    name: "Snow Valley Heights",
     location: "Shimla, Himachal Pradesh",
     type: "Hotel",
     rating: 4.7,
     price: 3899,
     priceLabel: "₹3,899 / night",
-    image: shimlaImage,
-    images: [shimlaImage],
-    roomOptions: buildHotelRoomOptions(3899, shimlaImage),
+    image: snow_valley_01,
+    images: [snow_valley_01, snow_valley_02, snow_valley_03, snow_valley_04, snow_valley_05, snow_valley_06, snow_valley_07],
+    roomOptions: buildHotelRoomOptions(3899, pride_image_02, {
+      "deluxe-double-room": [yog_niketan_deluxe_room_01, yog_niketan_deluxe_room_02,yog_niketan_deluxe_room_03],
+      "luxury-king-room": [yog_niketan_king_room_01, yog_niketan_king_room_02, yog_niketan_king_room_03],
+      "premium-room": [yog_niketan_premium_room_01, yog_niketan_premium_room_02, yog_niketan_premium_room_03],
+      "family-room": [yog_niketan_family_room_01, yog_niketan_family_room_02, yog_niketan_family_room_03],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [yog_niketan_family_room_01, yog_niketan_deluxe_room_02, yog_niketan_deluxe_room_03],
+    }),
+    description: "A welcoming mountain stay with cedar views, warm interiors, and convenient access to Shimla's historic Mall Road and Ridge.",
+    amenities: ["Mountain view", "Breakfast", "Wi-Fi", "Heating", "Parking"],
+    availability: "Available throughout the season",
+    terms: [
+      "Check-in time: 2:00 PM",
+      "Check-out time: 11:00 AM",
+      "Free cancellation up to 24 hours before arrival.",
+      "Government ID is required at check-in.",
+      "Heating is available on request.",
+    ],
+    checkInTime: "14:00",
+    checkOutTime: "11:00",
+    roomInfo: "Mountain View Room • 2 Guests • 1 Room",
+  },
+  {
+    id: "the-oberoi-ceil",
+    slug: "the-oberoi-ceil",
+    destinationId: "shimla",
+    destination: "Shimla",
+    name: "The Oberoi Ceil",
+    location: "Shimla, Himachal Pradesh",
+    type: "Hotel",
+    rating: 4.5,
+    price: 2499,
+    priceLabel: "₹2,499 / night",
+    image:the_oberoi_ceil_01 ,
+    images: [the_oberoi_ceil_01, the_oberoi_ceil_02, the_oberoi_ceil_03, the_oberoi_ceil_04, the_oberoi_ceil_05, the_oberoi_ceil_06, the_oberoi_ceil_07],
+    roomOptions: buildHotelRoomOptions(2199, pride_image_02, {
+      "deluxe-double-room": [hotel_kavita_07, hotel_kavita_13],
+      "luxury-king-room": [hotel_kavita_05, pride_image_13],
+      "premium-room": [hotel_kavita_06, pride_image_14],
+      "family-room": [hotel_kavita_10, hotel_kavita_12],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [hotel_kavita_11, hotel_kavita_13],
+    }),
+    description: "A welcoming mountain stay with cedar views, warm interiors, and convenient access to Shimla's historic Mall Road and Ridge.",
+    amenities: ["Mountain view", "Breakfast", "Wi-Fi", "Heating", "Parking"],
+    availability: "Available throughout the season",
+    terms: [
+      "Check-in time: 2:00 PM",
+      "Check-out time: 11:00 AM",
+      "Free cancellation up to 24 hours before arrival.",
+      "Government ID is required at check-in.",
+      "Heating is available on request.",
+    ],
+    checkInTime: "14:00",
+    checkOutTime: "11:00",
+    roomInfo: "Mountain View Room • 2 Guests • 1 Room",
+  },
+  {
+    id: "the-hotel-valley",
+    slug: "the-hotel-valley",
+    destinationId: "shimla",
+    destination: "Shimla",
+    name: "The Hotel Valley",
+    location: "Shimla, Himachal Pradesh",
+    type: "Hotel",
+    rating: 4.5,
+    price: 2899,
+    priceLabel: "₹2,899 / night",
+    image: hotel_valley_01,
+    images: [hotel_valley_01, hotel_valley_02, hotel_valley_03, hotel_valley_04, hotel_valley_05],
+    roomOptions: buildHotelRoomOptions(3899, pride_image_02, {
+      "deluxe-double-room": [yog_niketan_deluxe_room_01, yog_niketan_deluxe_room_02,yog_niketan_deluxe_room_03],
+      "luxury-king-room": [yog_niketan_king_room_01, yog_niketan_king_room_02, yog_niketan_king_room_03],
+      "premium-room": [yog_niketan_premium_room_01, yog_niketan_premium_room_02, yog_niketan_premium_room_03],
+      "family-room": [yog_niketan_family_room_01, yog_niketan_family_room_02, yog_niketan_family_room_03],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [yog_niketan_family_room_01, yog_niketan_deluxe_room_02, yog_niketan_deluxe_room_03],
+    }),
     description: "A welcoming mountain stay with cedar views, warm interiors, and convenient access to Shimla's historic Mall Road and Ridge.",
     amenities: ["Mountain view", "Breakfast", "Wi-Fi", "Heating", "Parking"],
     availability: "Available throughout the season",
@@ -419,19 +627,61 @@ export const hotels = [
     roomInfo: "Garden Room • 2 Guests • 1 Room",
   },
   {
-    id: "ganga-view-retreat",
-    slug: "ganga-view-retreat",
+    id: "yog-niketan-by-sanskriti",
+    slug: "yog-niketan-by-sanskriti",
     destinationId: "rishikesh",
     destination: "Rishikesh",
-    name: "Ganga View Retreat",
+    name: "Yog Niketan by Sanskriti",
     location: "Rishikesh, Uttarakhand",
     type: "Hotel",
     rating: 4.8,
     price: 3299,
     priceLabel: "₹3,299 / night",
-    image: rishikeshStay,
-    images: [rishikeshStay, rishikeshImage],
-    roomOptions: buildHotelRoomOptions(3299, [rishikeshStay, rishikeshImage]),
+    image: yog_niketan_03,
+    images: [yog_niketan_03, yog_niketan_02, yog_niketan_01, yog_niketan_04, yog_niketan_04, yog_niketan_05, yog_niketan_06, yog_niketan_07, yog_niketan_08, yog_niketan_09, yog_niketan_10],
+    roomOptions: buildHotelRoomOptions(2199, pride_image_02, {
+      "deluxe-double-room": [yog_niketan_deluxe_room_01, yog_niketan_deluxe_room_02,yog_niketan_deluxe_room_03],
+      "luxury-king-room": [yog_niketan_king_room_01, yog_niketan_king_room_02, yog_niketan_king_room_03],
+      "premium-room": [yog_niketan_premium_room_01, yog_niketan_premium_room_02, yog_niketan_premium_room_03],
+      "family-room": [yog_niketan_family_room_01, yog_niketan_family_room_02, yog_niketan_family_room_03],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [yog_niketan_family_room_01, yog_niketan_deluxe_room_02, yog_niketan_deluxe_room_03],
+    }),
+    description: "A peaceful riverside retreat for quiet mornings, yoga sessions, and easy visits to Rishikesh's ghats and suspension bridges.",
+    amenities: ["River view", "Yoga space", "Breakfast", "Wi-Fi", "Parking"],
+    availability: "Available throughout the season",
+    terms: [
+      "Check-in time: 1:00 PM",
+      "Check-out time: 11:00 AM",
+      "Free cancellation up to 24 hours before arrival.",
+      "Government ID is required at check-in.",
+      "Quiet hours apply after 10:00 PM.",
+    ],
+    checkInTime: "13:00",
+    checkOutTime: "11:00",
+    roomInfo: "Ganga View Room • 2 Guests • 1 Room",
+  },
+  {
+    id: "lemon-tree-hotels",
+    slug: "lemon-tree-hotels",
+    destinationId: "rishikesh",
+    destination: "Rishikesh",
+    name: "Lemon Tree",
+    location: "Rishikesh, Uttarakhand",
+    type: "Hotel",
+    rating: 4.8,
+    price: 3299,
+    priceLabel: "₹3,299 / night",
+    image: lemon_tree_01,
+    images: [lemon_tree_01, lemon_tree_02, lemon_tree_03, lemon_tree_04, lemon_tree_05, lemon_tree_06, lemon_tree_07],
+    roomOptions: buildHotelRoomOptions(2199, lemon_tree_03, {
+      "deluxe-double-room": [lemon_tree_deluxe_room_01, lemon_tree_deluxe_room_02,lemon_tree_deluxe_room_03],
+      "luxury-king-room": [yog_niketan_king_room_01, yog_niketan_king_room_02, yog_niketan_king_room_03],
+      "premium-room": [yog_niketan_premium_room_01, yog_niketan_premium_room_02, yog_niketan_premium_room_03],
+      "family-room": [yog_niketan_family_room_01, yog_niketan_family_room_02, yog_niketan_family_room_03],
+      "executive-room": [hotel_kavita_03, ujjainStay],
+      "suite-room": [yog_niketan_family_room_01, yog_niketan_deluxe_room_02, yog_niketan_deluxe_room_03],
+    }),
     description: "A peaceful riverside retreat for quiet mornings, yoga sessions, and easy visits to Rishikesh's ghats and suspension bridges.",
     amenities: ["River view", "Yoga space", "Breakfast", "Wi-Fi", "Parking"],
     availability: "Available throughout the season",
@@ -459,7 +709,14 @@ export const hotels = [
     priceLabel: "₹3,799 / night",
     image: mumbaiImage,
     images: [mumbaiImage],
-    roomOptions: buildHotelRoomOptions(3799, mumbaiImage),
+    roomOptions: buildHotelRoomOptions(2199, pride_image_02, {
+      "deluxe-double-room": [hotel_atlas_01, hotel_atlas_02],
+      "luxury-king-room": [hotel_atlas_03, hotel_atlas_04],
+      "premium-room": [hotel_atlas_05, hotel_atlas_06, hotel_atlas_07],
+      "family-room": [hotel_atlas_08, hotel_atlas_09],
+      "executive-room": [hotel_atlas_14, hotel_atlas_15],
+      "suite-room": [hotel_atlas_10, hotel_atlas_11],
+    }),
     description: "A practical city base with comfortable rooms, everyday conveniences, and easy access to Mumbai's neighbourhoods and transit.",
     amenities: ["Air conditioning", "Wi-Fi", "Breakfast", "Room service", "Transit access"],
     availability: "Available daily",
@@ -624,22 +881,111 @@ export const cabOperators = [
     ],
   },
   {
-    id: "shimla-travel-cabs",
-    slug: "shimla-travel-cabs",
+    id: "himalayan-taxi-services",
+    slug: "himalayan-taxi-services",
     destinationId: "shimla",
     destination: "Shimla",
-    initials: "SC",
-    name: "Shimla Travel Cabs",
-    image: sedanVehicleImages[0],
-    images: [...sedanVehicleImages, ...suvVehicleImages, ...tempoTravellerVehicleImages],
+    initials: "HTS",
+    name: "Himalayan Taxi Service",
+    image: shivay_suv_01,
+    images: [shambhu_travels_02,shambhu_travels_03,shivay_suv_01, shivay_suv_02],
     description: "Dependable local rides and hill-route transfers with experienced drivers familiar with Shimla's mountain roads.",
-    rating: 4.7,
+    rating: 4.2,
     vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
     seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
-    vehicleOptions: buildCabVehicleOptions(
-      ["Sedan", "SUV", "Tempo Traveller"],
-      ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
-    ),
+    vehicleOptions: [
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [mahakal_suv_01, mahakal_suv_02, mahakal_suv_03],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [mahakal_traveller_01, mahakal_traveller_02, mahakal_traveller_03],
+      },
+    ],
+    pricing: "From ₹1,600 / day",
+    price: 1600,
+    services: ["Shimla sightseeing", "Airport transfer", "Hill-station day trips"],
+    pickupInfo: "Hotel, bus stand, or agreed city pickup",
+    dropInfo: "Shimla attractions and nearby hill towns",
+    availability: "Available daily from 7:00 AM to 9:00 PM",
+    terms: [
+      "Cancellation up to 2 hours before pickup is free.",
+      "Mountain routes may take longer during weather disruptions.",
+      "Extra distance beyond the selected route is charged separately.",
+      "Luggage capacity depends on the selected vehicle.",
+    ],
+  },
+  {
+    id: "mountain-drivers",
+    slug: "mountain-drivers",
+    destinationId: "shimla",
+    destination: "Shimla",
+    initials: "MD",
+    name: "Mountain Drivers",
+    image: mountain_driver_01,
+    images: [mountain_driver_01, mountain_driver_02, mountain_driver_04, mountain_driver_03],
+    description: "Dependable local rides and hill-route transfers with experienced drivers familiar with Shimla's mountain roads.",
+    rating: 4.2,
+    vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
+    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
+    vehicleOptions: [
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [mahakal_suv_01, mahakal_suv_02, mahakal_suv_03],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [mahakal_traveller_01, mahakal_traveller_02, mahakal_traveller_03],
+      },
+    ],
+    pricing: "From ₹1,600 / day",
+    price: 1600,
+    services: ["Hill-station day trips", "Shimla sightseeing", "Airport transfer"],
+    pickupInfo: "Hotel, bus stand, or agreed city pickup",
+    dropInfo: "Shimla attractions and nearby hill towns",
+    availability: "Available daily from 7:00 AM to 9:00 PM",
+    terms: [
+      "Cancellation up to 2 hours before pickup is free.",
+      "Mountain routes may take longer during weather disruptions.",
+      "Extra distance beyond the selected route is charged separately.",
+      "Luggage capacity depends on the selected vehicle.",
+    ],
+  },
+  {
+    id: "thakur-taxi-services",
+    slug: "thakur-taxi-services",
+    destinationId: "shimla",
+    destination: "Shimla",
+    initials: "TTS",
+    name: "Thakur Taxi Services",
+    image: mountain_driver_01,
+    images: [shambhu_travels_02,shambhu_travels_03,shivay_suv_01, shivay_suv_02],
+    description: "Dependable local rides and hill-route transfers with experienced drivers familiar with Shimla's mountain roads.",
+    rating: 4.2,
+    vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
+    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
+     vehicleOptions: [
+      {
+        name: "Sedan",
+        seatingCapacity: "Up to 4 passengers",
+        images: [shivay_sedan_01, shivay_sedan_02, shivay_sedan_03],
+      },
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [shivay_suv_01, shivay_suv_02, shivay_suv_03],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [shivay_traveller_01, shivay_traveller_02, shivay_traveller_03],
+      },
+    ],
     pricing: "From ₹1,600 / day",
     price: 1600,
     services: ["Shimla sightseeing", "Airport transfer", "Hill-station day trips"],
@@ -690,18 +1036,31 @@ export const cabOperators = [
     destination: "Rishikesh",
     initials: "RC",
     name: "Rishikesh Travel Cabs",
-    image: sedanVehicleImages[0],
-    images: [...sedanVehicleImages, ...suvVehicleImages, ...tempoTravellerVehicleImages],
+    image: shivay_sedan_01,
+    images: [shivay_suv_01, shivay_traveller_01, shivay_sedan_02],
     description: "Local transfers and regional rides for riverside stays, yoga retreats, and nearby Himalayan excursions.",
     rating: 4.7,
     vehicleTypes: ["Sedan", "SUV", "Tempo Traveller"],
     seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
-    vehicleOptions: buildCabVehicleOptions(
-      ["Sedan", "SUV", "Tempo Traveller"],
-      ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
-    ),
-    pricing: "From ₹1,500 / day",
-    price: 1500,
+    vehicleOptions: [
+      {
+        name: "Sedan",
+        seatingCapacity: "Up to 4 passengers",
+        images: [shivay_sedan_01, shivay_sedan_02, shivay_sedan_03],
+      },
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [shivay_suv_01, shivay_suv_02, shivay_suv_03],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [shivay_traveller_01, shivay_traveller_02, shivay_traveller_03],
+      },
+    ],
+    pricing: "From ₹2,500 / day",
+    price: 2500,
     services: ["Local sightseeing", "Station transfer", "Nearby hill trips"],
     pickupInfo: "Railway station, bus stand, or hotel pickup",
     dropInfo: "Rishikesh attractions and nearby destinations",
@@ -713,6 +1072,84 @@ export const cabOperators = [
       "Luggage capacity depends on the selected vehicle.",
     ],
   },
+  {
+    id: "kts-travels-cabs",
+    slug: "kts-travels-cabs",
+    destinationId: "rishikesh",
+    destination: "Rishikesh",
+    initials: "KTS",
+    name: "KTS Travel Cabs",
+    image: kts_cab_01,
+    images: [kts_cab_01, kts_cab_02, shivay_traveller_01],
+    description: "Local transfers and regional rides for riverside stays, yoga retreats, and nearby Himalayan excursions.",
+    rating: 4.5,
+    vehicleTypes: ["SUV", "Tempo Traveller"],
+    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
+    vehicleOptions: [
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [shivay_suv_01, shivay_suv_02, shivay_suv_03],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [shivay_traveller_01, shivay_traveller_02, shivay_traveller_03],
+      },
+    ],
+    pricing: "From ₹2,000 / day",
+    price: 2000,
+    services: ["Local sightseeing", "Station transfer", "Nearby hill trips"],
+    pickupInfo: "Railway station, bus stand, or hotel pickup",
+    dropInfo: "Rishikesh attractions and nearby destinations",
+    availability: "Available daily from 7:00 AM to 12:00 PM",
+    terms: [
+      "Cancellation up to 1 hours before pickup is free.",
+      "Route timings may change with traffic and weather.",
+      "Extra distance beyond the selected route is charged separately.",
+      "Luggage capacity depends on the selected vehicle.",
+    ],
+  },
+  {
+    id: "rishikesh-shambhu-cabs",
+    slug: "rishikesh-shambhu-cabs",
+    destinationId: "rishikesh",
+    destination: "Rishikesh",
+    initials: "ST",
+    name: "Shambhu Travels",
+    image: shambhu_travels_01,
+    images: [shambhu_travels_01, shambhu_travels_02, shambhu_travels_03],
+    description: "Local transfers and regional rides for riverside stays, yoga retreats, and nearby Himalayan excursions.",
+    rating: 4.9,
+    vehicleTypes: ["SUV", "Tempo Traveller"],
+    seatingCapacity: ["Up to 4 passengers", "Up to 6 passengers", "Up to 12 passengers"],
+    vehicleOptions: [
+      {
+        name: "SUV",
+        seatingCapacity: "Up to 6 passengers",
+        images: [kts_cab_01, kts_cab_02],
+      },
+      {
+        name: "Tempo Traveller",
+        seatingCapacity: "Up to 12 passengers",
+        images: [shivay_traveller_01, shivay_traveller_02, shivay_traveller_03],
+      },
+    ],
+    pricing: "From ₹3,000 / day",
+    price: 3000,
+    services: ["Local sightseeing", "Station transfer", "Nearby hill trips"],
+    pickupInfo: "Railway station, bus stand, or hotel pickup",
+    dropInfo: "Rishikesh attractions and nearby destinations",
+    availability: "Available daily from 6:00 AM to 9:00 PM",
+    terms: [
+      "Cancellation up to 2 hours before pickup is free.",
+      "Route timings may change with traffic and weather.",
+      "Extra distance beyond the selected route is charged separately.",
+      "Luggage capacity depends on the selected vehicle.",
+    ],
+  },
+
+
   {
     id: "mumbai-city-cabs",
     slug: "mumbai-city-cabs",
@@ -760,6 +1197,9 @@ import aman_guide_02 from "@/assets/aman-guide-02.jpeg";
 import ankit_guide from "@/assets/ankit-guide.jpeg";
 import ankit_guide_01 from "@/assets/ankit-guide-01.jpeg";
 import ankit_guide_02 from "@/assets/ankit-guide-02.jpeg";
+
+//Guide - Amit
+import amit_guide from "@/assets/amit_guide.jpeg";
 
 
 
@@ -826,8 +1266,8 @@ export const travelGuides = [
     destinationId: "rishikesh",
     destination: "Rishikesh",
     name: "Kavya Rawat",
-    image: rishikeshImage,
-    images: [rishikeshStay],
+    image: kavya_rawat,
+    images: [rishikesh_01, rishikesh_03],
     description: "Kavya blends spiritual discovery with riverfront walking routes for a calmer and more grounded experience.",
     rating: 4.8,
     languages: ["Hindi", "English"],
@@ -940,7 +1380,7 @@ export const travelGuides = [
     destinationId: "shimla",
     destination: "Shimla",
     name: "Explore Shimla with Amit",
-    image: shimlaImage,
+    image: amit_guide,
     images: [],
     description: "Amit shares Shimla's colonial landmarks, hillside lanes, and local favourites through relaxed, thoughtfully paced walks.",
     rating: 4.8,
@@ -1003,13 +1443,13 @@ export const travelGuides = [
     ],
   },
   {
-    id: "rishikesh-adventure-guide",
-    slug: "rishikesh-adventure-guide",
+    id: "vaibhav-rishsikesh-guide",
+    slug: "vaibhav-rishikesh-guide",
     destinationId: "rishikesh",
     destination: "Rishikesh",
-    name: "Rishikesh Adventure Guide",
-    image: rishikeshImage,
-    images: [rishikeshStay],
+    name: "Vaibhav Singh",
+    image: vaibhav_singh,
+    images: [rishikesh_02, rishikesh_04, rishikesh_05],
     description: "Discover riverside trails and outdoor highlights with a local guide focused on safe, well-paced adventure days.",
     rating: 4.9,
     languages: ["Hindi", "English"],

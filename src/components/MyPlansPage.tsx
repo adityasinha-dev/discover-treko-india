@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CalendarDays, MapPin, Route } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/api";
 import { Navbar } from "@/components/TrekoLanding";
 import { isSupportedDestination } from "@/data/treko";
 import {
@@ -11,6 +12,7 @@ import {
   saveTripSelection,
   type BookingRecord,
   type TripItem,
+  writeBookings,
 } from "@/lib/auth";
 
 const formatCurrency = (value: number) =>
@@ -40,37 +42,32 @@ function parsePlanDate(value: string): Date | null {
   return date;
 }
 
-function isCurrentOrFuturePlan(booking: BookingRecord, today: Date): boolean {
-  const travelDates = booking.items.flatMap((item) => {
-    const metadata = item.bookingMeta;
-    const dateValues = [
-      metadata?.["checkOutDate"],
-      metadata?.["travelDate"],
-      metadata?.["tourDate"],
-      metadata?.["dates"],
-    ];
+function formatPlanDate(value: unknown): string {
+  if (typeof value !== "string" || !value) return "Not specified";
+  const date = parsePlanDate(value);
+  return date
+    ? date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+    : value;
+}
 
-    return dateValues.flatMap((value) => {
-      if (typeof value !== "string" || !value) return [];
-      const lastDateInRange = value.includes("→") ? value.split("→").at(-1)?.trim() : value;
-      const date = parsePlanDate(lastDateInRange);
-      return date ? [date] : [];
-    });
-  });
-
-  const fallbackDate = parsePlanDate(booking.bookingDate);
-  const planEndDate = travelDates.length
-    ? new Date(Math.max(...travelDates.map((date) => date.getTime())))
-    : fallbackDate;
-
-  return planEndDate !== null && planEndDate >= today;
+function getStayDates(booking: BookingRecord): { checkIn: string; checkOut: string } {
+  const stay = booking.items.find((item) => item.type === "stay");
+  const metadata = stay?.bookingMeta;
+  const dates = typeof metadata?.["dates"] === "string" ? metadata["dates"] : "";
+  const range = dates.includes("→") ? dates.split("→").map((date) => date.trim()) : [];
+  return {
+    checkIn: formatPlanDate(metadata?.["checkInDate"] ?? range[0]),
+    checkOut: formatPlanDate(metadata?.["checkOutDate"] ?? range[1]),
+  };
 }
 
 export function MyPlansPage() {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [draftItems, setDraftItems] = useState<TripItem[]>([]);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
+  const [bookingSyncError, setBookingSyncError] = useState("");
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -78,26 +75,38 @@ export function MyPlansPage() {
       navigate({ to: "/login" });
       return;
     }
+    setIsAuthenticated(true);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    setBookings(
-      readBookings().filter(
-        (booking) =>
-          booking.userId === currentUser.id &&
-          isSupportedDestination(booking.destination) &&
-          booking.items.every((item) => isSupportedDestination(item.destination)) &&
-          isCurrentOrFuturePlan(booking, today),
-      ),
-    );
+    const filterBookings = (allBookings: BookingRecord[]) =>
+      allBookings.filter((booking) => booking.userId === currentUser.id);
+    setBookings(filterBookings(readBookings()));
+    let active = true;
+    void apiRequest<{ bookings: BookingRecord[] }>("/api/bookings/mine")
+      .then(({ bookings: serverBookings }) => {
+        if (!active) return;
+        writeBookings(serverBookings);
+        setBookings(filterBookings(serverBookings));
+        setBookingSyncError("");
+      })
+      .catch((error) => {
+        if (!active) return;
+        setBookingSyncError(
+          error instanceof Error
+            ? `Unable to refresh booking status: ${error.message}`
+            : "Unable to refresh booking status.",
+        );
+      });
     const supportedDraftItems = readTripSelection().filter((item) =>
       isSupportedDestination(item.destination),
     );
     saveTripSelection(supportedDraftItems);
     setDraftItems(supportedDraftItems);
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
-  if (!getCurrentUser()) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -108,6 +117,7 @@ export function MyPlansPage() {
         <section className="mx-auto max-w-3xl px-5 py-20 md:px-8">
           <div className="rounded-3xl border border-dashed border-border bg-card p-10 text-center shadow-card">
             <p className="section-label">My Plans</p>
+            {bookingSyncError ? <p role="alert" className="mt-4 text-sm text-destructive">{bookingSyncError}</p> : null}
             <h1 className="mt-4 font-display text-4xl font-semibold text-foreground">You don't have any trips planned yet.</h1>
             <p className="mt-4 text-muted-foreground">Build your next memorable journey across India.</p>
             <Button asChild className="mt-8 rounded-full">
@@ -128,6 +138,7 @@ export function MyPlansPage() {
           <h1 className="mt-3 font-display text-4xl font-semibold text-foreground md:text-5xl">
             {bookings.length ? "Your trips" : "Your trip selection"}
           </h1>
+          {bookingSyncError ? <p role="alert" className="mt-3 text-sm text-destructive">{bookingSyncError}</p> : null}
         </div>
         <div className="grid gap-6">
           {draftItems.length > 0 ? (
@@ -175,6 +186,8 @@ export function MyPlansPage() {
           ) : null}
           {bookings.map((booking) => {
             const isExpanded = activeBookingId === booking.id;
+            const stayDates = getStayDates(booking);
+            const paymentStatus = booking.paymentStatus ?? "Unpaid";
             return (
               <article key={booking.id} className="rounded-3xl border border-border bg-card p-6 shadow-card">
                 <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -195,6 +208,71 @@ export function MyPlansPage() {
                     <p className="mt-2 text-lg font-bold text-primary">{formatCurrency(booking.total)}</p>
                   </div>
                 </div>
+                {booking.status === "Confirmed" ? (
+                  <section className="mt-5 rounded-2xl bg-secondary p-5">
+                    <h3 className="font-display text-xl font-semibold text-foreground">Confirmed booking details</h3>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {booking.hotel ? (
+                        <>
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Check-in</p>
+                            <p className="mt-2 font-semibold text-foreground">{stayDates.checkIn}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Check-out</p>
+                            <p className="mt-2 font-semibold text-foreground">{stayDates.checkOut}</p>
+                          </div>
+                        </>
+                      ) : null}
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Payment status</p>
+                        <p className="mt-2 font-semibold text-foreground">
+                          {paymentStatus === "Paid" ? "Already paid" : "Payment due"}
+                        </p>
+                        {paymentStatus !== "Paid" ? (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            Amount due: {formatCurrency(booking.total)}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                    {booking.businesses?.length ? (
+                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                        {booking.businesses.map((business) => (
+                          <article
+                            key={`${business.businessName}-${business.listingName}`}
+                            className="rounded-lg border border-border bg-background p-4"
+                          >
+                            <p className="font-semibold text-foreground">{business.businessName}</p>
+                            <p className="text-sm text-muted-foreground">{business.listingName}</p>
+                            <p className="mt-3 text-sm">
+                              <span className="font-semibold">Address:</span>{" "}
+                              {business.address || "Not provided"}
+                            </p>
+                            <p className="mt-2 text-sm">
+                              <span className="font-semibold">Phone:</span>{" "}
+                              {business.phone ? (
+                                <a href={`tel:${business.phone}`} className="text-primary underline-offset-4 hover:underline">
+                                  {business.phone}
+                                </a>
+                              ) : (
+                                "Not provided"
+                              )}
+                            </p>
+                            {business.email ? (
+                              <p className="mt-2 text-sm">
+                                <span className="font-semibold">Email:</span>{" "}
+                                <a href={`mailto:${business.email}`} className="break-all text-primary underline-offset-4 hover:underline">
+                                  {business.email}
+                                </a>
+                              </p>
+                            ) : null}
+                          </article>
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
+                ) : null}
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
                   <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                     <span>Hotel: {booking.hotel || "?"}</span>

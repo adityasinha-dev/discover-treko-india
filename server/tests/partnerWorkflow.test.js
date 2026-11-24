@@ -6,8 +6,11 @@ import PartnerApplication from "../models/PartnerApplication.js";
 import Booking from "../models/Booking.js";
 import { loginAdmin } from "../controllers/adminController.js";
 import {
+  confirmBusinessBooking,
   createBooking,
+  getMyBookings,
   getBusinessDashboard,
+  getPublicPartnerListings,
   getPublicCabVehicleImages,
   reviewPartnerApplication,
   submitPartnerApplication,
@@ -22,6 +25,8 @@ const originalPartnerFindOneAndUpdate = PartnerApplication.findOneAndUpdate;
 const originalPartnerFind = PartnerApplication.find;
 const originalBookingFind = Booking.find;
 const originalBookingCreate = Booking.create;
+const originalBookingFindOneAndUpdate = Booking.findOneAndUpdate;
+const originalBookingUpdateOne = Booking.updateOne;
 const originalAdminId = process.env.ADMIN_ID;
 const originalAdminPassword = process.env.ADMIN_PASSWORD;
 const originalJwtSecret = process.env.JWT_SECRET;
@@ -53,6 +58,8 @@ test.afterEach(() => {
   PartnerApplication.find = originalPartnerFind;
   Booking.find = originalBookingFind;
   Booking.create = originalBookingCreate;
+  Booking.findOneAndUpdate = originalBookingFindOneAndUpdate;
+  Booking.updateOne = originalBookingUpdateOne;
   if (originalAdminId === undefined) delete process.env.ADMIN_ID;
   else process.env.ADMIN_ID = originalAdminId;
   if (originalAdminPassword === undefined) delete process.env.ADMIN_PASSWORD;
@@ -100,6 +107,8 @@ test("approved business dashboard queries bookings using only the authenticated 
         type: "Hotel",
         destination: "Goa",
         description: "A listed hotel.",
+        contactPhone: "1234567890",
+        contactEmail: "stay@example.com",
       },
     ],
   };
@@ -140,6 +149,186 @@ test("approved business dashboard queries bookings using only the authenticated 
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.application.status, "approved");
   assert.equal(res.body.bookings[0].id, "TRK-1");
+  assert.equal(res.body.application.listings[0].contactPhone, "1234567890");
+  assert.equal(res.body.application.listings[0].contactEmail, "stay@example.com");
+  assert.equal(res.body.bookings[0].customerName, "Guest");
+  assert.equal(res.body.bookings[0].customerEmail, "guest@example.com");
+  assert.equal(res.body.bookings[0].confirmedByCurrentBusiness, false);
+});
+
+test("public listings do not expose business contact phone or email", async () => {
+  const listing = {
+    _id: new mongoose.Types.ObjectId(),
+    name: "Private Contact Lodge",
+    type: "Hotel",
+    destination: "Goa",
+    description: "A listed hotel.",
+    contactPhone: "1234567890",
+    contactEmail: "stay@example.com",
+  };
+  const application = {
+    _id: new mongoose.Types.ObjectId(),
+    businessName: "Private Contact Lodge",
+    status: "approved",
+    listings: [listing],
+    toObject() {
+      return {
+        _id: this._id,
+        businessName: this.businessName,
+        status: this.status,
+        listings: this.listings,
+      };
+    },
+  };
+  PartnerApplication.find = (query) => {
+    assert.equal(query.status, "approved");
+    return {
+      async select() {
+        return [application];
+      },
+    };
+  };
+  const res = mockResponse();
+
+  await getPublicPartnerListings({ query: { type: "hotel" } }, res, (error) => {
+    throw error;
+  });
+
+  assert.equal(res.statusCode, 200);
+  assert.equal("contactPhone" in res.body.listings[0], false);
+  assert.equal("contactEmail" in res.body.listings[0], false);
+});
+
+test("customers can load their saved bookings and contact details", async () => {
+  const customerId = new mongoose.Types.ObjectId();
+  Booking.find = (query) => {
+    assert.deepEqual(query, { customerId });
+    return {
+      sort() {
+        return this;
+      },
+      limit() {
+        return this;
+      },
+      async lean() {
+        return [{
+          bookingId: "TRK-MY-PLAN",
+          customerId,
+          customerName: "Customer",
+          customerEmail: "customer@example.com",
+          customerPhone: "9876543210",
+          customerGender: "Prefer not to say",
+          customerPreferences: "Ground floor",
+          destination: "Goa",
+          items: [{
+            listingId: "listing-id",
+            name: "Coastal Stay",
+            type: "stay",
+            category: "Hotel",
+            destination: "Goa",
+            packageName: "Sea View",
+            quantity: 1,
+            price: 2500,
+            bookingMeta: { checkInDate: "2026-12-10", checkOutDate: "2026-12-12" },
+          }],
+          businesses: [{
+            businessName: "Coastal Hospitality",
+            listingName: "Coastal Stay",
+            listingType: "Hotel",
+            phone: "1234567890",
+            email: "stay@example.com",
+            address: "Exact property address",
+          }],
+          total: 5000,
+          couponUsed: null,
+          paymentStatus: "Unpaid",
+          status: "Confirmed",
+          createdAt: new Date("2026-11-23T00:00:00.000Z"),
+        }];
+      },
+    };
+  };
+  const res = mockResponse();
+
+  await getMyBookings({ user: { _id: customerId } }, res, (error) => {
+    throw error;
+  });
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.bookings[0].status, "Confirmed");
+  assert.equal(res.body.bookings[0].paymentStatus, "Unpaid");
+  assert.deepEqual(res.body.bookings[0].businesses[0], {
+    businessName: "Coastal Hospitality",
+    listingName: "Coastal Stay",
+    listingType: "Hotel",
+    phone: "1234567890",
+    email: "stay@example.com",
+    address: "Exact property address",
+  });
+  assert.equal(res.body.bookings[0].items[0].bookingMeta.checkInDate, "2026-12-10");
+});
+
+test("business confirmations remain pending until every associated business approves", async () => {
+  const firstBusinessId = new mongoose.Types.ObjectId();
+  const secondBusinessId = new mongoose.Types.ObjectId();
+  const booking = {
+    _id: new mongoose.Types.ObjectId(),
+    bookingId: "TRK-MULTI",
+    businessIds: [firstBusinessId, secondBusinessId],
+    confirmedBusinessIds: [],
+    status: "Pending",
+  };
+  let statusUpdateCount = 0;
+  Booking.findOneAndUpdate = async (filter, update) => {
+    assert.equal(filter.bookingId, booking.bookingId);
+    assert.equal(filter.status.$ne, "Cancelled");
+    const businessId = filter.businessIds;
+    if (!booking.businessIds.some((id) => id.toString() === businessId.toString())) return null;
+    const confirmedId = update.$addToSet.confirmedBusinessIds;
+    if (!booking.confirmedBusinessIds.some((id) => id.toString() === confirmedId.toString())) {
+      booking.confirmedBusinessIds.push(confirmedId);
+    }
+    return booking;
+  };
+  Booking.updateOne = async () => {
+    statusUpdateCount += 1;
+    booking.status = "Confirmed";
+    return { matchedCount: 1 };
+  };
+
+  const firstResponse = mockResponse();
+  await confirmBusinessBooking(
+    { params: { bookingId: booking.bookingId }, business: { _id: firstBusinessId } },
+    firstResponse,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(firstResponse.body.booking.status, "Pending");
+  assert.equal(firstResponse.body.booking.confirmedByCurrentBusiness, true);
+  assert.equal(statusUpdateCount, 0);
+
+  const secondResponse = mockResponse();
+  await confirmBusinessBooking(
+    { params: { bookingId: booking.bookingId }, business: { _id: secondBusinessId } },
+    secondResponse,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(secondResponse.body.booking.status, "Confirmed");
+  assert.equal(statusUpdateCount, 1);
+
+  const unauthorizedResponse = mockResponse();
+  await confirmBusinessBooking(
+    { params: { bookingId: booking.bookingId }, business: { _id: new mongoose.Types.ObjectId() } },
+    unauthorizedResponse,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(unauthorizedResponse.statusCode, 404);
+  assert.equal(statusUpdateCount, 1);
 });
 
 test("booking persistence assigns the customer and partner from authenticated and stored records", async () => {
@@ -151,7 +340,22 @@ test("booking persistence assigns the customer and partner from authenticated an
     businessQuery = query;
     return {
       async select() {
-        return [{ _id: businessId, listings: [{ _id: listingId }] }];
+        return [{
+          _id: businessId,
+          businessName: "Coastal Hospitality",
+          ownerEmail: "login@coastal.example",
+          phone: "1234567890",
+          address: "Property address",
+          listings: [{
+            _id: listingId,
+            name: "Coastal Stay",
+            type: "Hotel",
+            destination: "Goa",
+            contactPhone: "0987654321",
+            contactEmail: "contact@coastal.example",
+            address: "Exact hotel address",
+          }],
+        }];
       },
     };
   };
@@ -182,6 +386,13 @@ test("booking persistence assigns the customer and partner from authenticated an
         ],
         total: 2400,
         businessIds: ["attacker-supplied-business-id"],
+        customerDetails: {
+          name: "Booking Contact",
+          email: "booking-contact@example.com",
+          phone: "+1 (415) 555-0132",
+          gender: "Female",
+          preferences: "Ground-floor room, vegetarian meals.",
+        },
       },
     },
     res,
@@ -192,10 +403,50 @@ test("booking persistence assigns the customer and partner from authenticated an
 
   assert.equal(businessQuery.status, "approved");
   assert.equal(savedBooking.customerId, "authenticated-customer-id");
-  assert.equal(savedBooking.customerEmail, "customer@example.com");
+  assert.equal(savedBooking.customerName, "Booking Contact");
+  assert.equal(savedBooking.customerEmail, "booking-contact@example.com");
+  assert.equal(savedBooking.customerPhone, "+1 (415) 555-0132");
+  assert.equal(savedBooking.customerGender, "Female");
+  assert.equal(savedBooking.customerPreferences, "Ground-floor room, vegetarian meals.");
   assert.deepEqual(savedBooking.businessIds, [businessId]);
+  assert.deepEqual(savedBooking.businesses, [{
+    businessName: "Coastal Hospitality",
+    listingName: "Coastal Stay",
+    listingType: "Hotel",
+    phone: "0987654321",
+    email: "contact@coastal.example",
+    address: "Exact hotel address",
+  }]);
   assert.equal(res.statusCode, 201);
   assert.equal(res.body.booking.userId, "authenticated-customer-id");
+  assert.deepEqual(res.body.booking.customerDetails, {
+    name: "Booking Contact",
+    email: "booking-contact@example.com",
+    phone: "+1 (415) 555-0132",
+    gender: "Female",
+    preferences: "Ground-floor room, vegetarian meals.",
+  });
+  assert.deepEqual(res.body.booking.businesses, savedBooking.businesses);
+});
+
+test("booking requires valid checkout customer details", async () => {
+  const res = mockResponse();
+  await createBooking(
+    {
+      user: { _id: "authenticated-customer-id", name: "Customer", email: "customer@example.com" },
+      body: {
+        destination: "Goa",
+        items: [{ id: "listing-id", name: "Coastal Stay", type: "stay", destination: "Goa" }],
+        total: 2400,
+      },
+    },
+    res,
+    (error) => {
+      throw error;
+    },
+  );
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.message, "Please provide valid customer details.");
 });
 
 test("application submission creates a pending application bound to the authenticated owner", async () => {

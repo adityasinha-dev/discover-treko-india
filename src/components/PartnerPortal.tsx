@@ -21,13 +21,15 @@ import { buildCabVehicleOptions, destinations } from "@/data/treko";
 import { ApiRequestError, apiRequest } from "@/lib/api";
 import {
   clearAdminAuthToken,
+  clearAuthSession,
   getAdminAuthToken,
   getAuthToken,
   getCurrentUser,
   saveAdminAuthToken,
+  saveAuthSession,
 } from "@/lib/auth";
 
-type PartnerStatus = "pending" | "approved" | "rejected";
+type PartnerStatus = "pending" | "approved" | "rejected" | "suspended";
 type BusinessType = "Hotel" | "Cab Operator" | "Travel Guide";
 
 type PartnerListing = {
@@ -37,6 +39,28 @@ type PartnerListing = {
   destination: string;
   description: string;
   createdAt: string;
+  active: boolean;
+  images: string[];
+  city: string;
+  state: string;
+  address: string;
+  price: number | null;
+  priceLabel: string;
+  amenities: string[];
+  roomTypes: string[];
+  roomTypePhotos: Array<{ name: string; bedType: string; maxGuests: number; beds: number; price: number | null; description: string; amenities: string[]; images: string[] }>;
+  contactPhone: string;
+  contactEmail: string;
+  checkIn: string;
+  checkOut: string;
+  availability: string;
+  terms: string[];
+  serviceAreas: string[];
+  pickupLocations: string[];
+  seatingCapacity: number | null;
+  tourDuration: string;
+  languages: string[];
+  includedServices: string[];
   vehicleOptions: Array<{
     name: string;
     seatingCapacity: string;
@@ -64,9 +88,13 @@ type BusinessBooking = {
   id: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
+  customerGender?: string;
+  customerPreferences?: string;
   destination: string;
   bookingDate: string;
   status: string;
+  confirmedByCurrentBusiness: boolean;
   total: number;
   items: Array<{ name: string; type: string; packageName: string }>;
 };
@@ -79,6 +107,8 @@ type DashboardData = {
 const panelClass = "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8";
 const maxVehicleImageCount = 4;
 const maxVehicleImageBytes = 512 * 1024;
+const maxHotelImages = 12;
+const maxRoomTypeImages = 4;
 
 async function prepareVehicleImage(file: File): Promise<string> {
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
@@ -149,11 +179,13 @@ function StatusBadge({ status }: { status: PartnerStatus }) {
       ? "Pending approval"
       : status === "approved"
         ? "Approved"
-        : "Application rejected";
+        : status === "suspended"
+          ? "Suspended"
+          : "Application rejected";
   const classes =
     status === "approved"
       ? "bg-emerald-100 text-emerald-800"
-      : status === "rejected"
+      : status === "rejected" || status === "suspended"
         ? "bg-destructive/10 text-destructive"
         : "bg-amber-100 text-amber-800";
   return (
@@ -172,8 +204,67 @@ export function PartnerPage() {
   const [authReady, setAuthReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [partnerMode, setPartnerMode] = useState<"login" | "register">("login");
 
   useEffect(() => setAuthReady(true), []);
+
+  const handlePartnerLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    const form = new FormData(event.currentTarget);
+    try {
+      const result = await apiRequest<{ token: string; partner: PartnerApplication; user: { id: string; name: string; email: string } }>("/api/partners/login", {
+        method: "POST",
+        body: JSON.stringify({ email: form.get("email"), password: form.get("password") }),
+      });
+      const nameParts = result.user.name.trim().split(/\s+/);
+      saveAuthSession(result.token, {
+        id: result.user.id,
+        firstName: nameParts[0] ?? "Partner",
+        lastName: nameParts.slice(1).join(" "),
+        email: result.user.email,
+        plan: "Partner",
+        createdAt: new Date().toISOString(),
+      });
+      await navigate({ to: "/business-dashboard" });
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : "Unable to log in.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handlePartnerRegister = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    const form = new FormData(event.currentTarget);
+    try {
+      await apiRequest("/api/partners/register", {
+        method: "POST",
+        body: JSON.stringify({
+          ownerName: form.get("ownerName"),
+          businessName: form.get("businessName"),
+          email: form.get("email"),
+          phone: form.get("phone"),
+          password: form.get("password"),
+          businessType: form.get("businessType"),
+          destination: form.get("destination"),
+          address: form.get("address"),
+          city: form.get("city"),
+          state: form.get("state"),
+          description: form.get("description"),
+        }),
+      });
+      setPartnerMode("login");
+      setError("Registration successful. Your application is pending admin approval.");
+    } catch (registerError) {
+      setError(registerError instanceof Error ? registerError.message : "Unable to register.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -233,15 +324,39 @@ export function PartnerPage() {
                 Loading account…
               </div>
             ) : !getAuthToken() ? (
-              <div className="py-8 text-center">
-                <ShieldCheck className="mx-auto size-10 text-primary" />
-                <h2 className="mt-4 font-display text-2xl font-semibold">Sign in to apply</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Your application will be linked to your Treko account.
-                </p>
-                <Button asChild className="mt-6 rounded-full">
-                  <a href="/login">Sign in</a>
-                </Button>
+              <div>
+                <div className="grid grid-cols-2 rounded-xl bg-secondary p-1">
+                  <button type="button" onClick={() => { setPartnerMode("login"); setError(""); }} className={`rounded-lg py-2 text-sm font-semibold ${partnerMode === "login" ? "bg-card shadow-sm" : ""}`}>Partner Login</button>
+                  <button type="button" onClick={() => { setPartnerMode("register"); setError(""); }} className={`rounded-lg py-2 text-sm font-semibold ${partnerMode === "register" ? "bg-card shadow-sm" : ""}`}>Register</button>
+                </div>
+                {partnerMode === "login" ? (
+                  <form onSubmit={handlePartnerLogin} className="mt-6">
+                    <h2 className="font-display text-2xl font-semibold">Login as Partner</h2>
+                    <label className="mt-5 block text-sm font-semibold">Email<input required name="email" type="email" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                    <label className="mt-4 block text-sm font-semibold">Password<input required name="password" type="password" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                    {error ? <p role="alert" className="mt-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+                    <Button type="submit" disabled={submitting} className="mt-6 h-12 w-full rounded-full">{submitting ? "Signing in…" : "Login to Partner Dashboard"}</Button>
+                  </form>
+                ) : (
+                  <form onSubmit={handlePartnerRegister} className="mt-6">
+                    <h2 className="font-display text-2xl font-semibold">Partner registration</h2>
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      <label className="block text-sm font-semibold">Full name<input required name="ownerName" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Business name<input required name="businessName" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Email<input required name="email" type="email" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Phone<input required name="phone" type="tel" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Password<input required name="password" type="password" minLength={8} className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Partner category<select required name="businessType" defaultValue="" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3"><option value="" disabled>Select category</option><option value="Hotel">Hotels &amp; Accommodation</option><option value="Cab Operator">Cab &amp; Transportation</option><option value="Travel Guide">Local Guide / Tour</option></select></label>
+                      <label className="block text-sm font-semibold">Destination<select required name="destination" defaultValue="" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3"><option value="" disabled>Select destination</option>{destinations.map((item) => <option key={item.id} value={item.name}>{item.name}</option>)}</select></label>
+                      <label className="block text-sm font-semibold">City<input name="city" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">State<input name="state" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                      <label className="block text-sm font-semibold">Business address<input name="address" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                    </div>
+                    <label className="mt-4 block text-sm font-semibold">Business description<textarea required name="description" rows={4} maxLength={1000} className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2" /></label>
+                    {error ? <p role="alert" className="mt-4 rounded-lg bg-secondary p-3 text-sm">{error}</p> : null}
+                    <Button type="submit" disabled={submitting} className="mt-6 h-12 w-full rounded-full">{submitting ? "Submitting…" : "Submit Partner Application"}</Button>
+                  </form>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
@@ -370,8 +485,16 @@ export function BusinessDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  const [confirmingBookingId, setConfirmingBookingId] = useState<string | null>(null);
+  const [bookingActionError, setBookingActionError] = useState("");
   const [savingVehicleKey, setSavingVehicleKey] = useState("");
   const [vehiclePhotoErrors, setVehiclePhotoErrors] = useState<Record<string, string>>({});
+  const [listingSubmitting, setListingSubmitting] = useState(false);
+  const [listingError, setListingError] = useState("");
+  const [hotelPhotos, setHotelPhotos] = useState<string[]>([]);
+  const [roomTypeNames, setRoomTypeNames] = useState<string[]>([]);
+  const [roomTypePhotos, setRoomTypePhotos] = useState<Record<string, string[]>>({});
+  const [roomTypeDetails, setRoomTypeDetails] = useState<Record<string, { bedType: string; maxGuests: number; beds: number; price: number; description: string; amenities: string }>>({});
 
   const loadStatus = useCallback(
     async (isRefresh = false) => {
@@ -427,6 +550,157 @@ export function BusinessDashboardPage() {
         ? { ...current, application: updateApplication(current.application)! }
         : current,
     );
+  };
+
+  const confirmBooking = async (bookingId: string) => {
+    setConfirmingBookingId(bookingId);
+    setBookingActionError("");
+    try {
+      const result = await apiRequest<{
+        booking: Pick<BusinessBooking, "status" | "confirmedByCurrentBusiness">;
+      }>(`/api/business/bookings/${encodeURIComponent(bookingId)}/confirm`, {
+        method: "PATCH",
+      });
+      setDashboard((current) =>
+        current
+          ? {
+              ...current,
+              bookings: current.bookings.map((booking) =>
+                booking.id === bookingId ? { ...booking, ...result.booking } : booking,
+              ),
+            }
+          : current,
+      );
+    } catch (confirmError) {
+      setBookingActionError(
+        confirmError instanceof Error ? confirmError.message : "Unable to confirm this booking.",
+      );
+    } finally {
+      setConfirmingBookingId(null);
+    }
+  };
+
+  const handleHotelPhotoUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.currentTarget.files ?? []);
+    event.currentTarget.value = "";
+    if (!files.length) return;
+    if (hotelPhotos.length + files.length > maxHotelImages) {
+      setListingError(`General hotel photos are limited to ${maxHotelImages} images.`);
+      return;
+    }
+    setListingSubmitting(true);
+    setListingError("");
+    try {
+      const prepared = await Promise.all(files.map(prepareVehicleImage));
+      setHotelPhotos((current) => [...current, ...prepared].slice(0, maxHotelImages));
+    } catch (uploadError) {
+      setListingError(uploadError instanceof Error ? uploadError.message : "Unable to prepare hotel photos.");
+    } finally {
+      setListingSubmitting(false);
+    }
+  };
+
+  const handleRoomTypePhotoUpload = async (
+    event: ChangeEvent<HTMLInputElement>,
+    roomName: string,
+  ) => {
+    const files = Array.from(event.currentTarget.files ?? []);
+    event.currentTarget.value = "";
+    if (!files.length) return;
+    const currentPhotos = roomTypePhotos[roomName] ?? [];
+    if (currentPhotos.length + files.length > maxRoomTypeImages) {
+      setListingError(`${roomName} photos are limited to ${maxRoomTypeImages} images.`);
+      return;
+    }
+    setListingSubmitting(true);
+    setListingError("");
+    try {
+      const prepared = await Promise.all(files.map(prepareVehicleImage));
+      setRoomTypePhotos((current) => ({
+        ...current,
+        [roomName]: [...(current[roomName] ?? []), ...prepared].slice(0, maxRoomTypeImages),
+      }));
+    } catch (uploadError) {
+      setListingError(uploadError instanceof Error ? uploadError.message : "Unable to prepare room photos.");
+    } finally {
+      setListingSubmitting(false);
+    }
+  };
+
+  const createListing = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    setListingSubmitting(true);
+    setListingError("");
+    const form = new FormData(formElement);
+    try {
+      const body = {
+        name: form.get("listingName"),
+        description: form.get("listingDescription"),
+        type: application?.businessType,
+        price: form.get("listingPrice"),
+        priceLabel: form.get("listingPrice"),
+        images: hotelPhotos,
+        amenities: String(form.get("listingAmenities") ?? "").split(",").map((item) => item.trim()).filter(Boolean),
+        roomTypes: roomTypeNames,
+        roomTypePhotos: roomTypeNames.map((name) => ({
+          name,
+          ...(roomTypeDetails[name] ?? { bedType: "", maxGuests: 2, beds: 1, price: 0, description: "", amenities: "" }),
+          amenities: String(roomTypeDetails[name]?.amenities ?? "").split(",").map((item) => item.trim()).filter(Boolean),
+          images: roomTypePhotos[name] ?? [],
+        })),
+        city: form.get("listingCity"),
+        state: form.get("listingState"),
+        address: form.get("listingAddress"),
+        category: form.get("listingCategory"),
+        rating: form.get("listingRating"),
+        checkIn: form.get("checkInTime"),
+        checkOut: form.get("checkOutTime"),
+        availability: form.get("listingAvailability"),
+        contactPhone: form.get("listingContactPhone"),
+        contactEmail: form.get("listingContactEmail"),
+        terms: String(form.get("listingTerms") ?? "").split("\n").map((item) => item.trim()).filter(Boolean),
+        active: true,
+      };
+      const result = await apiRequest<{ listing: PartnerListing }>("/api/business/listings", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      setApplication((current) => current ? { ...current, listings: [...current.listings, result.listing] } : current);
+      setDashboard((current) => current ? { ...current, application: { ...current.application, listings: [...current.application.listings, result.listing] } } : current);
+      formElement?.reset();
+      setHotelPhotos([]);
+      setRoomTypeNames([]);
+      setRoomTypePhotos({});
+      setRoomTypeDetails({});
+    } catch (createError) {
+      setListingError(createError instanceof Error ? createError.message : "Unable to create listing.");
+    } finally {
+      setListingSubmitting(false);
+    }
+  };
+
+  const saveListingChanges = async (listingId: string, changes: Partial<PartnerListing>) => {
+    try {
+      const result = await apiRequest<{ listing: PartnerListing }>(`/api/business/listings/${listingId}`, {
+        method: "PATCH",
+        body: JSON.stringify(changes),
+      });
+      updateListingInState(result.listing);
+    } catch (changeError) {
+      setListingError(changeError instanceof Error ? changeError.message : "Unable to update listing.");
+    }
+  };
+
+  const deleteListing = async (listingId: string) => {
+    if (!window.confirm("Delete this listing?")) return;
+    try {
+      await apiRequest(`/api/business/listings/${listingId}`, { method: "DELETE" });
+      setApplication((current) => current ? { ...current, listings: current.listings.filter((item) => item.id !== listingId) } : current);
+      setDashboard((current) => current ? { ...current, application: { ...current.application, listings: current.application.listings.filter((item) => item.id !== listingId) } } : current);
+    } catch (deleteError) {
+      setListingError(deleteError instanceof Error ? deleteError.message : "Unable to delete listing.");
+    }
   };
 
   const saveVehicleImages = async (
@@ -595,6 +869,25 @@ export function BusinessDashboardPage() {
     );
   }
 
+  if (application.status === "suspended") {
+    return (
+      <PortalFrame>
+        <section className="mx-auto max-w-3xl px-5 py-14 md:py-20">
+          <div className={`${panelClass} text-center`}>
+            <XCircle className="mx-auto size-10 text-destructive" />
+            <div className="mt-6"><StatusBadge status="suspended" /></div>
+            <h1 className="mt-5 font-display text-3xl font-semibold">Partner account suspended</h1>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              Restricted partner features are unavailable while this account is suspended.
+            </p>
+            {application.reviewNote ? <p className="mt-5 rounded-xl bg-secondary p-4 text-left text-sm">{application.reviewNote}</p> : null}
+            <Button onClick={() => { clearAuthSession(); void navigate({ to: "/partner" }); }} variant="outline" className="mt-6 rounded-full"><LogOut />Logout</Button>
+          </div>
+        </section>
+      </PortalFrame>
+    );
+  }
+
   if (application.status === "rejected") {
     return (
       <PortalFrame>
@@ -683,12 +976,119 @@ export function BusinessDashboardPage() {
               {error}
             </p>
           ) : null}
+          <details className={`${panelClass} mb-8`}>
+            <summary className="cursor-pointer font-display text-xl font-semibold">Add new listing</summary>
+            <form onSubmit={createListing} className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Listing overview</p>
+              </div>
+              <label className="block text-sm font-semibold">{application?.businessType === "Hotel" ? "Hotel name" : "Listing name"}<input required name="listingName" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              <label className="block text-sm font-semibold">{application?.businessType === "Hotel" ? "Starting price per night" : "Price / fare"}<input name="listingPrice" type="number" min="0" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              {application?.businessType === "Hotel" ? (
+                <>
+                  <label className="block text-sm font-semibold">Hotel category<select name="listingCategory" defaultValue="" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3"><option value="" disabled>Select category</option><option>Budget Hotel</option><option>Hotel</option><option>Resort</option><option>Mountain Resort</option><option>Homestay</option><option>Boutique Hotel</option><option>Luxury Hotel</option></select></label>
+                  <label className="block text-sm font-semibold">Guest rating<input name="listingRating" type="number" min="0" max="5" step="0.1" placeholder="4.5" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                </>
+              ) : null}
+              <div className="sm:col-span-2">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Location and contact</p>
+              </div>
+              <label className="block text-sm font-semibold">City<input name="listingCity" required className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              <label className="block text-sm font-semibold">State<input name="listingState" required className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              <label className="block text-sm font-semibold sm:col-span-2">Full address<input name="listingAddress" required className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              <label className="block text-sm font-semibold">
+                Business phone <span className="font-normal text-muted-foreground">(shown at checkout)</span>
+                <input name="listingContactPhone" type="tel" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" />
+              </label>
+              <label className="block text-sm font-semibold">
+                Business email <span className="font-normal text-muted-foreground">(shown at checkout)</span>
+                <input name="listingContactEmail" type="email" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" />
+              </label>
+              {application?.businessType === "Hotel" ? (
+                <>
+                  <label className="block text-sm font-semibold sm:col-span-2">
+                    General hotel photos
+                    <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleHotelPhotoUpload} className="mt-2 block w-full rounded-lg border border-input bg-background p-2 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground" />
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">{hotelPhotos.length}/{maxHotelImages} selected</span>
+                  </label>
+                  {hotelPhotos.length ? (
+                    <div className="grid grid-cols-3 gap-2 sm:col-span-2 md:grid-cols-6">
+                      {hotelPhotos.map((photo, index) => (
+                        <div key={`${photo.slice(0, 40)}-${index}`} className="relative">
+                          <img src={photo} alt={`Hotel photo ${index + 1}`} className="aspect-square w-full rounded-lg object-cover" />
+                          <button type="button" onClick={() => setHotelPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))} className="absolute right-1 top-1 rounded-full bg-background/90 p-1" aria-label={`Remove hotel photo ${index + 1}`}><XCircle className="size-4" /></button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  <label className="block text-sm font-semibold sm:col-span-2">
+                    Room types
+                    <input
+                      name="listingRoomTypes"
+                      placeholder="Deluxe, Suite, Family Room"
+                      onChange={(event) => {
+                        const names = event.target.value.split(",").map((name) => name.trim()).filter(Boolean).filter((name, index, names) => names.indexOf(name) === index).slice(0, 20);
+                        setRoomTypeNames(names);
+                        setRoomTypePhotos((current) => Object.fromEntries(Object.entries(current).filter(([name]) => names.includes(name))));
+                      }}
+                      className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3"
+                    />
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">Enter names separated by commas.</span>
+                  </label>
+                  {roomTypeNames.map((roomName) => (
+                    <div key={roomName} className="rounded-2xl border border-border p-4 sm:col-span-2">
+                      <p className="font-semibold">{roomName} room details</p>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        <label className="block text-xs font-semibold">Bed type<input value={roomTypeDetails[roomName]?.bedType ?? ""} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { maxGuests: 2, beds: 1, price: 0, description: "", amenities: "" }), bedType: event.target.value } }))} placeholder="Double Bed" className="mt-1 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm" /></label>
+                        <label className="block text-xs font-semibold">Sleeps<input type="number" min="1" value={roomTypeDetails[roomName]?.maxGuests ?? 2} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { bedType: "", beds: 1, price: 0, description: "", amenities: "" }), maxGuests: Number(event.target.value) } }))} className="mt-1 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm" /></label>
+                        <label className="block text-xs font-semibold">Beds<input type="number" min="1" value={roomTypeDetails[roomName]?.beds ?? 1} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { bedType: "", maxGuests: 2, price: 0, description: "", amenities: "" }), beds: Number(event.target.value) } }))} className="mt-1 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm" /></label>
+                        <label className="block text-xs font-semibold">Price per night<input type="number" min="0" value={roomTypeDetails[roomName]?.price ?? 0} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { bedType: "", maxGuests: 2, beds: 1, description: "", amenities: "" }), price: Number(event.target.value) } }))} className="mt-1 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm" /></label>
+                      </div>
+                      <label className="mt-3 block text-xs font-semibold">Room description<textarea value={roomTypeDetails[roomName]?.description ?? ""} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { bedType: "", maxGuests: 2, beds: 1, price: 0, amenities: "" }), description: event.target.value } }))} rows={2} placeholder="Describe the room's comfort, view, and features." className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" /></label>
+                      <label className="mt-3 block text-xs font-semibold">Room amenities (comma-separated)<input value={roomTypeDetails[roomName]?.amenities ?? ""} onChange={(event) => setRoomTypeDetails((current) => ({ ...current, [roomName]: { ...(current[roomName] ?? { bedType: "", maxGuests: 2, beds: 1, price: 0, description: "" }), amenities: event.target.value } }))} placeholder="AC, Wi-Fi, Breakfast" className="mt-1 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm" /></label>
+                      <p className="mt-4 text-xs font-semibold">Room photos</p>
+                      <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => void handleRoomTypePhotoUpload(event, roomName)} className="mt-2 block w-full rounded-lg border border-input bg-background p-2 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground" />
+                      <span className="mt-1 block text-xs text-muted-foreground">{(roomTypePhotos[roomName] ?? []).length}/{maxRoomTypeImages} selected</span>
+                      {(roomTypePhotos[roomName] ?? []).length ? (
+                        <div className="mt-3 grid grid-cols-3 gap-2 md:grid-cols-6">
+                          {(roomTypePhotos[roomName] ?? []).map((photo, index) => (
+                            <div key={`${photo.slice(0, 40)}-${index}`} className="relative">
+                              <img src={photo} alt={`${roomName} photo ${index + 1}`} className="aspect-square w-full rounded-lg object-cover" />
+                              <button type="button" onClick={() => setRoomTypePhotos((current) => ({ ...current, [roomName]: (current[roomName] ?? []).filter((_, photoIndex) => photoIndex !== index) }))} className="absolute right-1 top-1 rounded-full bg-background/90 p-1" aria-label={`Remove ${roomName} photo ${index + 1}`}><XCircle className="size-4" /></button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </>
+              ) : null}
+              <div className="sm:col-span-2">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Facilities and policies</p>
+              </div>
+              <label className="block text-sm font-semibold sm:col-span-2">Amenities (comma-separated)<input name="listingAmenities" placeholder="Wi-Fi, Parking, Restaurant, Room service" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+              {application?.businessType === "Hotel" ? (
+                <>
+                  <label className="block text-sm font-semibold">Availability<input name="listingAvailability" placeholder="Available throughout the season" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block text-sm font-semibold">Check-in<input name="checkInTime" type="time" defaultValue="14:00" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                    <label className="block text-sm font-semibold">Check-out<input name="checkOutTime" type="time" defaultValue="12:00" className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3" /></label>
+                  </div>
+                  <label className="block text-sm font-semibold sm:col-span-2">Terms and conditions (one per line)<textarea name="listingTerms" rows={4} placeholder={"Free cancellation up to 24 hours before arrival.\nGovernment ID required at check-in."} className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2" /></label>
+                </>
+              ) : null}
+              <label className="block text-sm font-semibold sm:col-span-2">Description<textarea required name="listingDescription" rows={4} maxLength={3000} className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2" /></label>
+              {listingError ? <p role="alert" className="sm:col-span-2 text-sm text-destructive">{listingError}</p> : null}
+              <Button type="submit" disabled={listingSubmitting} className="sm:col-span-2 rounded-full">{listingSubmitting ? "Publishing…" : "Publish listing"}</Button>
+            </form>
+          </details>
           <div className="grid gap-8 lg:grid-cols-2">
             <section className={panelClass}>
               <h2 className="font-display text-2xl font-semibold">Bookings</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Bookings associated with your Treko listing.
               </p>
+              {bookingActionError ? <p role="alert" className="mt-4 text-sm text-destructive">{bookingActionError}</p> : null}
               {!dashboard?.bookings.length ? (
                 <div className="mt-6 rounded-2xl border border-dashed border-border p-8 text-center">
                   <CalendarDays className="mx-auto size-8 text-muted-foreground" />
@@ -708,8 +1108,26 @@ export function BusinessDashboardPage() {
                         </span>
                       </div>
                       <p className="mt-3 text-sm">
-                        <span className="font-semibold">Customer:</span> {booking.customerName} ·{" "}
-                        {booking.customerEmail}
+                        <span className="font-semibold">Customer details:</span>{" "}
+                        {booking.customerName} · {booking.customerEmail}
+                      </p>
+                      <p className="mt-2 text-sm">
+                        <span className="font-semibold">Phone:</span>{" "}
+                        {booking.customerPhone ? (
+                          <a href={`tel:${booking.customerPhone}`} className="text-primary underline-offset-4 hover:underline">
+                            {booking.customerPhone}
+                          </a>
+                        ) : (
+                          "Not provided"
+                        )}
+                      </p>
+                      <p className="mt-2 text-sm">
+                        <span className="font-semibold">Gender:</span>{" "}
+                        {booking.customerGender || "Not provided"}
+                      </p>
+                      <p className="mt-2 text-sm">
+                        <span className="font-semibold">Preferences:</span>{" "}
+                        {booking.customerPreferences || "None provided"}
                       </p>
                       <p className="mt-2 text-sm text-muted-foreground">
                         <span className="font-semibold text-foreground">Booked:</span>{" "}
@@ -730,6 +1148,22 @@ export function BusinessDashboardPage() {
                       <p className="mt-3 text-sm font-semibold">
                         Booking total: ₹{booking.total.toLocaleString("en-IN")}
                       </p>
+                      {booking.status === "Pending" && booking.confirmedByCurrentBusiness ? (
+                        <p className="mt-3 text-sm text-muted-foreground">
+                          Availability confirmed. Waiting for the other selected businesses.
+                        </p>
+                      ) : null}
+                      {booking.status === "Pending" && !booking.confirmedByCurrentBusiness ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="mt-4 rounded-full"
+                          disabled={confirmingBookingId === booking.id}
+                          onClick={() => void confirmBooking(booking.id)}
+                        >
+                          {confirmingBookingId === booking.id ? "Confirming…" : "Confirm availability"}
+                        </Button>
+                      ) : null}
                     </article>
                   ))}
                 </div>
@@ -747,7 +1181,7 @@ export function BusinessDashboardPage() {
                       <h3 className="font-semibold">{listing.name}</h3>
                       <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-emerald-800">
                         <BadgeCheck className="mr-1 inline size-3" />
-                        Approved
+                        {listing.active === false ? "Inactive" : "Active"}
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-primary">
@@ -756,6 +1190,14 @@ export function BusinessDashboardPage() {
                     <p className="mt-3 text-sm leading-6 text-muted-foreground">
                       {listing.description}
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => void saveListingChanges(listing.id, { active: listing.active === false })}>
+                        {listing.active === false ? "Activate" : "Deactivate"}
+                      </Button>
+                      <Button type="button" size="sm" variant="outline" className="rounded-full text-destructive" onClick={() => void deleteListing(listing.id)}>
+                        <Trash2 /> Delete
+                      </Button>
+                    </div>
                     {listing.type === "Cab Operator" ? (
                       <div className="mt-5 border-t border-border pt-5">
                         <h4 className="font-semibold">Vehicle photos</h4>
@@ -886,6 +1328,9 @@ export function AdminPartnerApplicationsPage() {
   const [error, setError] = useState("");
   const [activeId, setActiveId] = useState("");
   const [reviewNote, setReviewNote] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const loadApplications = useCallback(async () => {
     if (!getAdminAuthToken()) {
@@ -922,7 +1367,7 @@ export function AdminPartnerApplicationsPage() {
     void loadApplications();
   }, [loadApplications, navigate]);
 
-  const review = async (applicationId: string, status: "approved" | "rejected") => {
+  const review = async (applicationId: string, status: "approved" | "rejected" | "suspended" | "reactivated") => {
     setActiveId(applicationId);
     setError("");
     try {
@@ -948,6 +1393,14 @@ export function AdminPartnerApplicationsPage() {
       setActiveId("");
     }
   };
+
+  const filteredApplications = applications.filter((application) => {
+    const needle = search.trim().toLowerCase();
+    const matchesSearch = !needle || [application.businessName, application.ownerName, application.ownerEmail].some((value) => value.toLowerCase().includes(needle));
+    const matchesStatus = statusFilter === "all" || application.status === statusFilter;
+    const matchesCategory = categoryFilter === "all" || application.businessType === categoryFilter;
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
 
   const handleLogout = async () => {
     try {
@@ -1004,6 +1457,11 @@ export function AdminPartnerApplicationsPage() {
               </Button>
             </div>
           </div>
+          <div className="mt-6 grid gap-3 rounded-2xl bg-secondary p-4 sm:grid-cols-3">
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, email, or business" className="h-11 rounded-lg border border-input bg-background px-3 text-sm" />
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="h-11 rounded-lg border border-input bg-background px-3 text-sm"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="suspended">Suspended</option></select>
+            <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} className="h-11 rounded-lg border border-input bg-background px-3 text-sm"><option value="all">All categories</option><option value="Hotel">Hotels</option><option value="Cab Operator">Cabs</option><option value="Travel Guide">Guides</option></select>
+          </div>
           {error ? (
             <p
               role="alert"
@@ -1023,7 +1481,7 @@ export function AdminPartnerApplicationsPage() {
             </div>
           ) : (
             <div className="mt-8 space-y-5">
-              {applications.map((application) => (
+              {filteredApplications.map((application) => (
                 <article key={application.id} className={panelClass}>
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
@@ -1099,6 +1557,16 @@ export function AdminPartnerApplicationsPage() {
                         </Button>
                       </div>
                     </div>
+                  ) : null}
+                  {application.status === "approved" ? (
+                    <Button onClick={() => void review(application.id, "suspended")} disabled={Boolean(activeId)} variant="outline" className="mt-5 rounded-full">
+                      <XCircle /> Suspend partner
+                    </Button>
+                  ) : null}
+                  {application.status === "suspended" ? (
+                    <Button onClick={() => void review(application.id, "reactivated")} disabled={Boolean(activeId)} className="mt-5 rounded-full">
+                      <BadgeCheck /> Reactivate partner
+                    </Button>
                   ) : null}
                 </article>
               ))}

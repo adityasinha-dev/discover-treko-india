@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { ArrowLeft, Clock3, Trash2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   readTripSelection,
   saveTripSelection,
   type BookingRecord,
+  type CustomerGender,
   type TripItem,
   writeBookings,
 } from "@/lib/auth";
@@ -41,6 +42,11 @@ export function CheckoutPage() {
   const [booking, setBooking] = useState<BookingRecord | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerGender, setCustomerGender] = useState<CustomerGender>("Prefer not to say");
+  const [customerPreferences, setCustomerPreferences] = useState("");
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -49,6 +55,8 @@ export function CheckoutPage() {
       return;
     }
 
+    setCustomerName(`${currentUser.firstName} ${currentUser.lastName}`.trim());
+    setCustomerEmail(currentUser.email);
     const supportedItems = readTripSelection().filter((item) =>
       isSupportedDestination(item.destination),
     );
@@ -92,7 +100,8 @@ export function CheckoutPage() {
     setCouponApplied("");
   };
 
-  const handleCompleteBooking = async () => {
+  const handleCompleteBooking = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     const currentUser = getCurrentUser();
     if (!currentUser || !items.length) return;
     if (items.some((item) => !isSupportedDestination(item.destination))) return;
@@ -108,6 +117,13 @@ export function CheckoutPage() {
           items,
           total: finalTotal,
           couponUsed: couponApplied || null,
+          customerDetails: {
+            name: customerName.trim(),
+            email: customerEmail.trim(),
+            phone: customerPhone.trim(),
+            gender: customerGender,
+            preferences: customerPreferences.trim(),
+          },
         }),
       });
       const existingBookings = readBookings();
@@ -150,6 +166,45 @@ export function CheckoutPage() {
               <div className="rounded-2xl bg-secondary p-5"><p className="text-sm text-muted-foreground">Booking date</p><p className="mt-2 font-display text-2xl font-semibold">{new Date(booking.bookingDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p></div>
               <div className="rounded-2xl bg-secondary p-5"><p className="text-sm text-muted-foreground">Status</p><p className="mt-2 font-display text-2xl font-semibold text-amber-700">{booking.status}</p></div>
             </div>
+            <section className="mt-8">
+              <h2 className="font-display text-2xl font-semibold">Business contact details</h2>
+              {booking.businesses?.length ? (
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {booking.businesses.map((business) => (
+                    <article key={`${business.businessName}-${business.listingName}`} className="rounded-2xl border border-border bg-card p-5">
+                      <h3 className="font-display text-xl font-semibold">{business.businessName}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{business.listingName}</p>
+                      <dl className="mt-4 space-y-3 text-sm">
+                        <div>
+                          <dt className="font-semibold">Business phone</dt>
+                          <dd className="mt-1">
+                            {business.phone ? <a href={`tel:${business.phone}`} className="text-primary underline-offset-4 hover:underline">{business.phone}</a> : <span className="text-muted-foreground">Not provided</span>}
+                          </dd>
+                        </div>
+                        {business.email ? (
+                          <div>
+                            <dt className="font-semibold">Business email</dt>
+                            <dd className="mt-1">
+                              <a href={`mailto:${business.email}`} className="break-all text-primary underline-offset-4 hover:underline">
+                                {business.email}
+                              </a>
+                            </dd>
+                          </div>
+                        ) : null}
+                        <div>
+                          <dt className="font-semibold">Property address</dt>
+                          <dd className="mt-1 leading-6 text-muted-foreground">{business.address || "Address not provided"}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 rounded-xl bg-secondary p-4 text-sm text-muted-foreground">
+                  Business contact details are not available for the selected listings yet.
+                </p>
+              )}
+            </section>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button onClick={() => navigate({ to: "/my-plans" })} className="rounded-full">View My Plans</Button>
               <Button variant="outline" asChild className="rounded-full"><a href="/explore">Continue exploring</a></Button>
@@ -167,7 +222,7 @@ export function CheckoutPage() {
         <div className="mb-8 flex items-center gap-3 text-sm font-semibold text-primary">
           <a href="/explore" className="inline-flex items-center gap-2"><ArrowLeft className="size-4" /> Back to Explore</a>
         </div>
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <form onSubmit={handleCompleteBooking} className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-5">
             <div>
               <p className="section-label">Checkout</p>
@@ -208,6 +263,92 @@ export function CheckoutPage() {
                 </article>
               ))
             )}
+            {items.length > 0 ? (
+              <section className="rounded-3xl border border-border bg-card p-6 shadow-card">
+                <h2 className="font-display text-2xl font-semibold text-foreground">Customer details</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  These details are requested for this booking only and shared with the selected businesses.
+                </p>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <label className="block text-sm font-semibold">
+                    Full name
+                    <Input
+                      required
+                      minLength={2}
+                      maxLength={120}
+                      autoComplete="name"
+                      value={customerName}
+                      onChange={(event) => setCustomerName(event.target.value)}
+                      className="mt-2 h-11"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold">
+                    Email address
+                    <Input
+                      required
+                      type="email"
+                      maxLength={254}
+                      autoComplete="email"
+                      value={customerEmail}
+                      onChange={(event) => setCustomerEmail(event.target.value)}
+                      className="mt-2 h-11"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold">
+                    Phone number
+                    <Input
+                      required
+                      type="tel"
+                      autoComplete="tel"
+                      maxLength={25}
+                      value={customerPhone}
+                      onChange={(event) => setCustomerPhone(event.target.value)}
+                      className="mt-2 h-11"
+                    />
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
+                      Enter 7 to 15 digits; spaces and common phone formatting are accepted.
+                    </span>
+                  </label>
+                  <label className="block text-sm font-semibold">
+                    Gender
+                    <select
+                      required
+                      value={customerGender}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        if (
+                          value === "Female" ||
+                          value === "Male" ||
+                          value === "Non-binary" ||
+                          value === "Other" ||
+                          value === "Prefer not to say"
+                        ) {
+                          setCustomerGender(value);
+                        }
+                      }}
+                      className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
+                    >
+                      <option value="Prefer not to say">Prefer not to say</option>
+                      <option value="Female">Female</option>
+                      <option value="Male">Male</option>
+                      <option value="Non-binary">Non-binary</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm font-semibold sm:col-span-2">
+                    Preferences <span className="font-normal text-muted-foreground">(optional)</span>
+                    <textarea
+                      maxLength={1000}
+                      value={customerPreferences}
+                      onChange={(event) => setCustomerPreferences(event.target.value)}
+                      placeholder="Share room, dietary, accessibility, or other service preferences."
+                      rows={3}
+                      className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-normal"
+                    />
+                  </label>
+                </div>
+              </section>
+            ) : null}
           </div>
           <aside className="rounded-3xl border border-border bg-card p-6 shadow-card">
             <p className="section-label">Summary</p>
@@ -233,11 +374,11 @@ export function CheckoutPage() {
               </div>
             </div>
             {bookingError ? <p role="alert" className="mt-4 text-sm text-destructive">{bookingError}</p> : null}
-            <Button onClick={handleCompleteBooking} disabled={!items.length || bookingSubmitting} className="mt-8 h-12 w-full rounded-full text-base">
+            <Button type="submit" disabled={!items.length || bookingSubmitting} className="mt-8 h-12 w-full rounded-full text-base">
               {bookingSubmitting ? "Submitting booking…" : "Complete booking"}
             </Button>
           </aside>
-        </div>
+        </form>
       </section>
     </main>
   );
